@@ -13,6 +13,12 @@ class LoginViewController : UIViewController {
     @IBOutlet weak var emailText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
     
+    @IBAction func showSignUpInBrowser() {
+        let urlString = "https://www.udacity.com/account/auth#!/signin"
+        let url = NSURL(string: urlString)!
+        UIApplication.sharedApplication().openURL(url)
+    }
+    
     @IBAction func tryUdacityLogin(sender: AnyObject) {
         
         let jsonParameters : JSONDict = [
