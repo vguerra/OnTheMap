@@ -8,6 +8,6 @@
 
 import UIKit
 
-class ListViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ListViewController : UIViewController {
 
 }
