@@ -50,8 +50,13 @@ class LoginViewController : UIViewController {
                         if let errorMsg = error {
                             println("error fetching publi data: \(errorMsg)")
                         } else {
-//                            println("publi data json: \(JSONBody)")
-                            self.getStudentLocations()
+                             println("publi data json: \(JSONBody)")
+//                             perform segue
+//                             self.getStudentLocations()
+                            dispatch_async(dispatch_get_main_queue()) {
+                                let tabBarController = self.storyboard!.instantiateViewControllerWithIdentifier("StudentsTabBarController") as! UITabBarController
+                                self.presentViewController(tabBarController, animated: true, completion: nil)
+                            }
                         }
                 }
             }
