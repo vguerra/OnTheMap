@@ -177,12 +177,18 @@
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="YnR-fO-87g">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <connections>
+                                    <outlet property="delegate" destination="wMN-CL-mJb" id="81E-8x-Psc"/>
+                                </connections>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" image="MapIcon" id="vaW-Gp-RuS"/>
                     <navigationItem key="navigationItem" id="6gR-fO-1gr"/>
+                    <connections>
+                        <outlet property="map" destination="YnR-fO-87g" id="mo0-uv-isv"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="S11-Ng-6tz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
