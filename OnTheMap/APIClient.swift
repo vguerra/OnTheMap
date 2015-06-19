@@ -109,6 +109,29 @@ class APIClient : NSObject {
             jsonBody: jsonBody, completionHandler: completionHandler)
     }
 
+    func getStudentLocations( completionHandler : (locations : [StudentLocation]? , error:NSError?) -> Void ) -> Void {
+        let headers : HeadersDict = [
+            "X-Parse-Application-Id" : Constants.parseAppId,
+            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
+        ]
+        let parameters : URLParametersDict = [
+            "limit" : 100
+        ]
+        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
+            if let errorMsg = error {
+                completionHandler(locations: nil, error: errorMsg)
+            } else {
+                println("students location successful")
+                if let results = JSONBody.valueForKey("results") as? [[String : AnyObject]] {
+                    println("results: \(results)")
+                    completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
+                } else {
+                    println("unable to parse students location response")
+                }
+            }
+        }
+    }
+
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
