@@ -63,28 +63,5 @@ class LoginViewController : UIViewController {
         }
     }
     
-    func getStudentLocations() -> Void {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let headers : HeadersDict = [
-            "X-Parse-Application-Id" : appDelegate.parseAppId,
-            "X-Parse-REST-API-Key": appDelegate.parseRESTAPIKey
-        ]
-        let parameters : URLParametersDict = [
-            "limit" : 100
-        ]
-        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
-                if let errorMsg = error {
-                    println("error fetching Students locations:\(errorMsg)")
-                } else {
-                    println("students location successful")
-                    if let results = JSONBody.valueForKey("results") as? [[String : AnyObject]] {
-                        println("results: \(results)")
-                        let studenLocations = StudentLocation.arrayFromDictionaries(results)
-                    } else {
-                        println("unable to parse students location response")
-                    }
-                }
-        }
-    }
     
 }
