@@ -16,6 +16,8 @@ extension APIClient {
             "https://www.udacity.com/" : 5,
             "https://api.parse.com/1/" : 0
         ]
+        static let parseAppId : String = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
+        static let parseRESTAPIKey : String = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
     }
     
     struct Methods {
