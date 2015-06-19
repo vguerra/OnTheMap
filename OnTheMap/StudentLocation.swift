@@ -45,8 +45,10 @@ struct StudentLocation : Printable {
         dateFormater.dateStyle = NSDateFormatterStyle.MediumStyle
         dateFormater.timeStyle = NSDateFormatterStyle.MediumStyle
         
-        createdAt = dateFormater.dateFromString(dict["createdAt"] as! String)!
-        updatedAt = dateFormater.dateFromString(dict["updatedAt"] as! String)!
+//        createdAt = dateFormater.dateFromString(dict["createdAt"] as! String)!
+//        updatedAt = dateFormater.dateFromString(dict["updatedAt"] as! String)!
+        createdAt = NSDate()
+        updatedAt = NSDate()
     }
     
     static func arrayFromDictionaries(results: [[String:AnyObject]]) -> [StudentLocation] {
