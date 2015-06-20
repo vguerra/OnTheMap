@@ -8,6 +8,36 @@
 
 import UIKit
 
-class ListViewController : UIViewController {
-
+class ListViewController : UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let logoutButton = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain, target: self, action: "dummySelector")
+        let refreshButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "dummySelector")
+        let locationButton = UIBarButtonItem(image: UIImage(named: "PinIcon"), style: UIBarButtonItemStyle.Plain, target: self, action: "dummySelector")
+        
+        self.navigationItem.setLeftBarButtonItems([logoutButton], animated: true)
+        self.navigationItem.setRightBarButtonItems([refreshButton, locationButton], animated: true)
+        self.navigationItem.title = "On The Map"
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 100
+    }
+    
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let studentCell = tableView.dequeueReusableCellWithIdentifier("StudentLocationCell", forIndexPath: indexPath) as! UITableViewCell
+        
+        studentCell.imageView!.image = UIImage(named: "PinIcon")
+        studentCell.textLabel!.text = "Victor Guerra"
+        
+        return studentCell
+    }
+    
+    func dummySelector() {
+        println("dummy proc called")
+    }
 }
