@@ -209,15 +209,13 @@
                                         <rect key="frame" x="27" y="37" width="553" height="281"/>
                                     </mapView>
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z8V-Uv-b9O">
-                                        <rect key="frame" x="174" y="243" width="113" height="30"/>
+                                        <rect key="frame" x="53" y="171" width="113" height="30"/>
                                         <state key="normal" title="Find on the Map">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eb8-2v-L9u">
-                                        <rect key="frame" x="416" y="240" width="84" height="22"/>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
-                                        <state key="normal" title="Submit"/>
+                                        <connections>
+                                            <action selector="findMapButtonTouchUp" destination="PsA-7e-i99" eventType="touchUpInside" id="9vZ-pO-MY3"/>
+                                        </connections>
                                     </button>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="Enter Location" translatesAutoresizingMaskIntoConstraints="NO" id="dwu-Ul-5En">
                                         <rect key="frame" x="202" y="37" width="240" height="128"/>
@@ -225,6 +223,14 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eb8-2v-L9u">
+                                        <rect key="frame" x="53" y="251" width="84" height="22"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
+                                        <state key="normal" title="Submit"/>
+                                        <connections>
+                                            <action selector="submitButtonTouchUp" destination="PsA-7e-i99" eventType="touchUpInside" id="7LV-Q8-L2E"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
