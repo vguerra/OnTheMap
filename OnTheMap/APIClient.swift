@@ -132,6 +132,61 @@ class APIClient : NSObject {
         }
     }
 
+    func postStudentLocation(studentLocation : StudentLocation, completionHandler : (error : NSError?) -> Void) -> Void {
+    
+        let headers : HeadersDict = [
+            "X-Parse-Application-Id" : Constants.parseAppId,
+            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
+        ]
+        
+        let jsonBody : JSONDict = [
+            "uniqueKey" : studentLocation.uniqueKey,
+            "firstName" : studentLocation.firstName,
+            "lastName"  : studentLocation.lastName,
+            "mapString" : studentLocation.mapString,
+            "mediaURL"  : studentLocation.mediaURL,
+            "latitude"  : studentLocation.latitude,
+            "longitude" : studentLocation.longitude
+        ]
+        
+        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
+            JSONBody , error in
+            if let errorMsg = error {
+                completionHandler(error: errorMsg)
+            } else {
+                completionHandler(error: nil)
+            }
+        }
+    }
+    
+    func putStudentLocation(studentLocation : StudentLocation, completionHandler : (error : NSError?) -> Void) -> Void {
+        let headers : HeadersDict = [
+            "X-Parse-Application-Id" : Constants.parseAppId,
+            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
+        ]
+        
+        let jsonBody : JSONDict = [
+            "uniqueKey" : studentLocation.uniqueKey,
+            "firstName" : studentLocation.firstName,
+            "lastName"  : studentLocation.lastName,
+            "mapString" : studentLocation.mapString,
+            "mediaURL"  : studentLocation.mediaURL,
+            "latitude"  : studentLocation.latitude,
+            "longitude" : studentLocation.longitude
+        ]
+        
+        let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId, key: "id", value: studentLocation.objectId)!
+        
+        APIClient.sharedInstance().taskForPUTMethod(APIClient.Constants.ParseURLSecure, method: method, parameters: headers, jsonBody: jsonBody) { JSONBody, error in
+            
+            if let errorMsg = error {
+                completionHandler(error: errorMsg)
+            } else {
+                completionHandler(error: nil)
+            }
+        }
+    }
+    
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
@@ -145,8 +200,6 @@ class APIClient : NSObject {
                 return NSError(domain: "TMDB Error", code: 1, userInfo: userInfo)
             }
         }
-        let variable : Bool
-        variable = true
         return error
     }
     
