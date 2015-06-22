@@ -24,6 +24,7 @@ extension APIClient {
         static let AuthenticationSession = "api/session"
         static let PublicUserData = "api/users/{id}"
         static let StudentLocations = "classes/StudentLocation"
+        static let StudentLocationId = "classes/StudentLocation/{id}"
     }
     
     struct ParameterKeys {
