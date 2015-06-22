@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
 class InfoPostingViewController : UIViewController {
 
@@ -29,6 +30,36 @@ class InfoPostingViewController : UIViewController {
         setUpForAddingLocationString()
     }
     
+    // MARK: IBActions
+    
+    
+    @IBAction func findMapButtonTouchUp() {
+        let locationString = "Vienna, Austria"
+        
+        let geoCoder = CLGeocoder()
+        
+        geoCoder.geocodeAddressString(locationString) {
+            placeMarks, error in
+            
+            if let errorMsg = error {
+                println("Error forward geocoding: \(locationString)")
+            } else if let placemark = placeMarks[0] as? CLPlacemark {
+                let pointAnnotation = MKPointAnnotation()
+                pointAnnotation.coordinate = placemark.location.coordinate
+                pointAnnotation.title = placemark.description
+                
+                self.map!.addAnnotation(pointAnnotation)
+                self.map!.centerCoordinate = pointAnnotation.coordinate
+                self.map!.selectAnnotation(pointAnnotation, animated: true)
+                
+                println("forward geocoded: \(locationString) ")
+                self.map!.hidden = false
+            }
+        }
+    }
+    
+    @IBAction func submitButtonTouchUp() {
+    }
     
     // MARK : UI Elements manipulation
     
