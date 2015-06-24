@@ -23,18 +23,26 @@ class InfoPostingViewController : UIViewController {
     
     @IBOutlet weak var map: MKMapView!
     
+    var studentCoordinates : CLLocationCoordinate2D? = nil
+    var appDelegate : AppDelegate!
+    
     // MARK : View life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        
         setUpForAddingLocationString()
+        
+        locationStringTextArea.text = "Vienna, Austria"
     }
     
     // MARK: IBActions
     
     
     @IBAction func findMapButtonTouchUp() {
-        let locationString = "Vienna, Austria"
+        let locationString = locationStringTextArea.text
         
         let geoCoder = CLGeocoder()
         
@@ -45,8 +53,9 @@ class InfoPostingViewController : UIViewController {
                 println("Error forward geocoding: \(locationString)")
             } else if let placemark = placeMarks[0] as? CLPlacemark {
                 let pointAnnotation = MKPointAnnotation()
-                pointAnnotation.coordinate = placemark.location.coordinate
-                pointAnnotation.title = placemark.description
+                self.studentCoordinates = placemark.location.coordinate
+                pointAnnotation.coordinate = self.studentCoordinates!
+                pointAnnotation.title = locationString
                 
                 self.map!.addAnnotation(pointAnnotation)
                 self.map!.centerCoordinate = pointAnnotation.coordinate
@@ -59,6 +68,34 @@ class InfoPostingViewController : UIViewController {
     }
     
     @IBAction func submitButtonTouchUp() {
+        // here we submit / update our location
+        if let coordinates = studentCoordinates {
+            let studentDict : [String : AnyObject] = [
+                "lastName" : "Guerra",
+                "firstName" : "Victor",
+                "uniqueKey" : appDelegate.userID!,
+                "mapString" : locationStringTextArea.text!,
+                "mediaURL" : "http://blg.vg",
+                "latitude" : coordinates.latitude,
+                "longitude" : coordinates.longitude
+            ]
+            
+            let studentLocation = StudentLocation(dict: studentDict)
+
+            let errorHandler : (error : NSError?) -> Void = { error in
+                if let errorMsg = error {
+                    println("there was an error sending your location")
+                }
+            }
+            
+            // do we need to POST or PUT? 
+            
+            if true {
+                APIClient.sharedInstance().postStudentLocation(studentLocation, completionHandler: errorHandler)
+            } else {
+                APIClient.sharedInstance().putStudentLocation(studentLocation, completionHandler: errorHandler)
+            }
+        }
     }
     
     // MARK : UI Elements manipulation
