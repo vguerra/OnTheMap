@@ -10,8 +10,18 @@ import UIKit
 
 class LoginViewController : UIViewController {
 
+    var appDelegate : AppDelegate!
+    
     @IBOutlet weak var emailText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
+    
+    // MARK: View Controller life cycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    }
+    
     
     @IBAction func showSignUpInBrowser() {
         let urlString = "https://www.udacity.com/account/auth#!/signin"
@@ -40,6 +50,7 @@ class LoginViewController : UIViewController {
                 println(JSONBody.valueForKey(APIClient.JSONResponseKeys.Session))
                 APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
                 let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
+                self.appDelegate.userID = user_id
                 
                 let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
                 println("\(publicDataMethod)")
