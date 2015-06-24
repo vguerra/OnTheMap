@@ -145,10 +145,11 @@ class APIClient : NSObject {
             values.append("\(key):\(value)")
         }
         
-        let whereValues = ",".join(values)
-        let parameters : URLParametersDict = [
-            "where" : "{\(whereValues)}"
-        ]
+        var parameters = URLParametersDict()
+        if !values.isEmpty {
+            let whereValues = ",".join(values)
+            parameters["where"] = "{\(whereValues)}"
+        }
         
         APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
             if let errorMsg = error {
