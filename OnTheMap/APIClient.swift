@@ -131,6 +131,40 @@ class APIClient : NSObject {
             }
         }
     }
+    
+    func queryStudentLocation(whereDict : [String : AnyObject], completionHandler : (locations : [StudentLocation]?, error : NSError?) -> Void) -> Void {
+
+        let headers : HeadersDict = [
+            "X-Parse-Application-Id" : Constants.parseAppId,
+            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
+        ]
+        
+        // composing where value. 
+        var values = [String]()
+        for (key, value) in whereDict {
+            values.append("\(key):\(value)")
+        }
+        
+        let whereValues = ",".join(values)
+        let parameters : URLParametersDict = [
+            "where" : "{\(whereValues)}"
+        ]
+        
+        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
+            if let errorMsg = error {
+                completionHandler(locations: nil, error: errorMsg)
+            } else {
+                println("query student location successful")
+                if let results = JSONBody.valueForKey("results") as? [[String : AnyObject]] {
+                    println("results: \(results)")
+                    completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
+                } else {
+                    println("Error querying student locations")
+                
+                }
+            }
+        }
+    }
 
     func postStudentLocation(studentLocation : StudentLocation, completionHandler : (error : NSError?) -> Void) -> Void {
     
@@ -151,6 +185,7 @@ class APIClient : NSObject {
         
         APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
             JSONBody , error in
+            println("Response from post location: \(JSONBody)")
             if let errorMsg = error {
                 completionHandler(error: errorMsg)
             } else {
@@ -178,7 +213,7 @@ class APIClient : NSObject {
         let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId, key: "id", value: studentLocation.objectId)!
         
         APIClient.sharedInstance().taskForPUTMethod(APIClient.Constants.ParseURLSecure, method: method, parameters: headers, jsonBody: jsonBody) { JSONBody, error in
-            
+            println("Response from put location: \(JSONBody)")            
             if let errorMsg = error {
                 completionHandler(error: errorMsg)
             } else {
