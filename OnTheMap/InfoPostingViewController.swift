@@ -36,6 +36,20 @@ class InfoPostingViewController : UIViewController {
         setUpForAddingLocationString()
         
         locationStringTextArea.text = "Vienna, Austria"
+        
+        // check if we have already an ObjectId
+        if appDelegate.objectID == nil {
+            APIClient.sharedInstance().queryStudentLocation(["uniqueKey" : appDelegate.userID]) {
+                locations, error in
+                
+                if let errorMsg = error {
+                    println("error on query: \(errorMsg)")
+                } else {
+                    let location = locations![0]
+                    self.appDelegate.objectID = location.objectId
+                }
+            }
+        }
     }
     
     // MARK: IBActions
@@ -62,7 +76,8 @@ class InfoPostingViewController : UIViewController {
                 self.map!.selectAnnotation(pointAnnotation, animated: true)
                 
                 println("forward geocoded: \(locationString) ")
-                self.map!.hidden = false
+                self.setUpForAddingLinkString()
+
             }
         }
     }
@@ -70,7 +85,7 @@ class InfoPostingViewController : UIViewController {
     @IBAction func submitButtonTouchUp() {
         // here we submit / update our location
         if let coordinates = studentCoordinates {
-            let studentDict : [String : AnyObject] = [
+            var studentDict : [String : AnyObject] = [
                 "lastName" : "Guerra",
                 "firstName" : "Victor",
                 "uniqueKey" : appDelegate.userID!,
@@ -79,22 +94,23 @@ class InfoPostingViewController : UIViewController {
                 "latitude" : coordinates.latitude,
                 "longitude" : coordinates.longitude
             ]
-            
-            let studentLocation = StudentLocation(dict: studentDict)
+            if let objectId = self.appDelegate.objectID {
+                studentDict["objectId"] = objectId
+                let studentLocation = StudentLocation(dict: studentDict)
 
-            let errorHandler : (error : NSError?) -> Void = { error in
-                if let errorMsg = error {
-                    println("there was an error sending your location")
+                println ("we go for POST")
+                APIClient.sharedInstance().postStudentLocation(studentLocation) { objectId, error in
+                    if let errorMsg = error {
+                        println("error doing post: \(errorMsg)")
+                    } else {
+                        self.appDelegate.objectID = objectId
+                    }
                 }
-            }
-            
-            // do we need to POST or PUT? 
-            
-            if true {
-                APIClient.sharedInstance().postStudentLocation(studentLocation, completionHandler: errorHandler)
             } else {
-                APIClient.sharedInstance().putStudentLocation(studentLocation, completionHandler: errorHandler)
+                studentDict[""]
             }
+            
+            APIClient.sharedInstance().putStudentLocation(studentLocation, completionHandler: errorHandler)
         }
     }
     
@@ -103,14 +119,14 @@ class InfoPostingViewController : UIViewController {
     // Step 1: Adding location string
     func setUpForAddingLocationString() {
         // All UI elements that need to be showed
-        questionLabel.hidden = false
-        locationStringTextArea.hidden = false
-        findMapButton.hidden = false
+        self.questionLabel.hidden = false
+        self.locationStringTextArea.hidden = false
+        self.findMapButton.hidden = false
         
         // All UI elements that need to be hidden
-        personalLinkTextArea.hidden = true
-        map.hidden = true
-        submitButton.hidden = true
+        self.personalLinkTextArea.hidden = true
+        self.map.hidden = true
+        self.submitButton.hidden = true
         
     }
     
@@ -118,14 +134,14 @@ class InfoPostingViewController : UIViewController {
     // Step 2: Adding link
     func setUpForAddingLinkString() {
         // All UI elements that need to be showed
-        questionLabel.hidden = true
-        locationStringTextArea.hidden = true
-        findMapButton.hidden = true
+        self.questionLabel.hidden = true
+        self.locationStringTextArea.hidden = true
+        self.findMapButton.hidden = true
         
         // All UI elements that need to be hidden
-        personalLinkTextArea.hidden = false
-        map.hidden = false
-        submitButton.hidden = false
+        self.personalLinkTextArea.hidden = false
+        self.map.hidden = false
+        self.submitButton.hidden = false
     }
 
 }
