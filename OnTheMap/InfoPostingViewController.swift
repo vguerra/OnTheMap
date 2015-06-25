@@ -47,6 +47,7 @@ class InfoPostingViewController : UIViewController {
                 } else {
                     let location = locations![0]
                     self.appDelegate.objectID = location.objectId
+                    println("found objectID: \(location.objectId)")
                 }
             }
         }
@@ -94,10 +95,19 @@ class InfoPostingViewController : UIViewController {
                 "latitude" : coordinates.latitude,
                 "longitude" : coordinates.longitude
             ]
-            if let objectId = self.appDelegate.objectID {
-                studentDict["objectId"] = objectId
-                let studentLocation = StudentLocation(dict: studentDict)
+            
+            studentDict["objectId"] = (appDelegate.objectID == nil ? "" : appDelegate.objectID!)
+            let studentLocation = StudentLocation(dict: studentDict)
 
+            if let objectId = self.appDelegate.objectID {
+                println("we go for PUT")
+                APIClient.sharedInstance().putStudentLocation(studentLocation) {
+                    error in
+                    if let errorMsg = error {
+                        println("error doing put: \(errorMsg)")
+                    }
+                }
+            } else {
                 println ("we go for POST")
                 APIClient.sharedInstance().postStudentLocation(studentLocation) { objectId, error in
                     if let errorMsg = error {
@@ -106,11 +116,7 @@ class InfoPostingViewController : UIViewController {
                         self.appDelegate.objectID = objectId
                     }
                 }
-            } else {
-                studentDict[""]
             }
-            
-            APIClient.sharedInstance().putStudentLocation(studentLocation, completionHandler: errorHandler)
         }
     }
     
