@@ -212,7 +212,7 @@ class APIClient : NSObject {
             "longitude" : studentLocation.longitude
         ]
         
-        let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId, key: "id", value: studentLocation.objectId)!
+        let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId, key: "id", value: studentLocation.objectId!)!
         
         APIClient.sharedInstance().taskForPUTMethod(APIClient.Constants.ParseURLSecure, method: method, headers: headers, jsonBody: jsonBody) { JSONBody, error in
             println("Response from put location: \(JSONBody)")            
