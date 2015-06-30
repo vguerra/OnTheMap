@@ -13,7 +13,7 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let logoutButton = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain, target: self, action: "dummySelector")
+        let logoutButton = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain, target: self, action: "logOut")
         let refreshButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "dummySelector")
         let locationButton = UIBarButtonItem(image: UIImage(named: "PinIcon"), style: UIBarButtonItemStyle.Plain, target: self, action: "showInfoPostingView")
         
@@ -45,5 +45,14 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
     
     func dummySelector() {
         println("dummy proc called")
+    }
+    
+    func logOut() {
+        APIClient.sharedInstance().logOutFromUdacity() { error in
+            if error == nil {
+                println("dismissing view")
+                self.dismissViewControllerAnimated(true, completion: nil)
+            }
+        }
     }
 }
