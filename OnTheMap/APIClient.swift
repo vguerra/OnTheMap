@@ -59,6 +59,7 @@ class APIClient : NSObject {
                     let newError = APIClient.errorForData(data, response: response, error: error)
                     completionHandler(result: nil, error: newError)
                 } else {
+                    println("no error, lets parse")
                     APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!, data: data, completionHandler: completionHandler)
                 }
             }
@@ -70,11 +71,11 @@ class APIClient : NSObject {
 
     // MARK: - DELETE
     
-    func taskForDELETEMethod(baseURL: String, method: String, parameters: URLParametersDict,
+    func taskForDELETEMethod(baseURL: String, method: String, parameters: URLParametersDict, headers: HeadersDict,
         completionHandler: CompletionClosure) -> NSURLSessionDataTask {
         
         return taskForHTTPMethod(.DELETE, baseURL: baseURL,
-            method: method, parameters: parameters, httpHeaders: HeadersDict(),
+            method: method, parameters: parameters, httpHeaders: headers,
             jsonBody: JSONDict(), completionHandler: completionHandler)
     }
 
@@ -224,6 +225,26 @@ class APIClient : NSObject {
         }
     }
     
+    func logOutFromUdacity(completionHandler : (error : NSError?) -> Void) -> Void {
+        var headers = HeadersDict()
+        
+        var xsrfCookie : NSHTTPCookie? = nil
+        let sharedCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+        for cookie in sharedCookieStorage.cookies as! [NSHTTPCookie] {
+            if cookie.name == "UY-XSRF-TOKEN" {
+                headers["X-XSRF-Token"] = cookie.value!
+            }
+        }
+        
+        APIClient.sharedInstance().taskForDELETEMethod(APIClient.Constants.UdacityURLSecure, method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: headers) {JSONBody, error in
+            if let errorMsg = error {
+                completionHandler(error: errorMsg)
+            } else {
+                println("no error")
+                completionHandler(error: nil)
+            }
+        }
+    }
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
@@ -244,7 +265,8 @@ class APIClient : NSObject {
     class func parseJSONWithCompletionHandler(skipChars: Int, data: NSData, completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
         
         var parsingError: NSError? = nil
-        println("till here everything ok")
+        println("till here everything ok, we skip \(skipChars)")
+        println("data: \(data)")
         let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(
             APIClient.skipFirstCharsOf(data, skipChars: skipChars),
             options: NSJSONReadingOptions.AllowFragments,
