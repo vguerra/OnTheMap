@@ -7,21 +7,39 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
 
-class LoginViewController : UIViewController {
+class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
 
     var appDelegate : AppDelegate!
     
     @IBOutlet weak var emailText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
     
+    
+    @IBOutlet weak var fbLoginButton: FBSDKLoginButton!
+    
     // MARK: View Controller life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        fbLoginButton.delegate = self
+        
+        
+        FBSDKProfile.enableUpdatesOnAccessTokenChange(true)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onTokenUpdated:", name: FBSDKAccessTokenDidChangeNotification, object: nil)
+        
     }
     
+    func onTokenUpdated(notification: NSNotification) {
+        if ( FBSDKAccessToken.currentAccessToken() != nil) {
+            println("we got a token")
+        } else {
+            println("we lost it")
+        }
+    }
     
     @IBAction func showSignUpInBrowser() {
         let urlString = "https://www.udacity.com/account/auth#!/signin"
@@ -74,5 +92,23 @@ class LoginViewController : UIViewController {
         }
     }
     
+    // MARK: conforming to FBSDKLoginButtonDelegate protocol
+    func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
     
+        if let errorMsg = error {
+            println("fb loging error: \(errorMsg)")
+        } else if result.isCancelled {
+            println("access token: \(FBSDKAccessToken.currentAccessToken())")
+            println("access token: \(FBSDKAccessToken.currentAccessToken().tokenString)")
+            println("fb was cancelled by the user")
+            println("fb authorization token: \(result.token!)")
+        } else {
+            println("fb authorization token: \(result.token!)")
+            appDelegate.fbToken = result.token
+        }
+    }
+    
+    func loginButtonDidLogOut(loginButton: FBSDKLoginButton!) {
+        println("loging out of FB")
+    }
 }
