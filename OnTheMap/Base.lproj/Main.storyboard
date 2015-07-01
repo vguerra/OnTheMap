@@ -66,12 +66,6 @@
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z45-hR-TsC" userLabel="Facebook Login">
                                 <rect key="frame" x="235" y="300" width="300" height="300"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BXb-gf-hZH">
-                                        <rect key="frame" x="95" y="262" width="111" height="30"/>
-                                        <state key="normal" title="Login Facebook">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Don't have an account?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3G1-jM-ppe">
                                         <rect key="frame" x="27" y="8" width="183" height="21"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -87,6 +81,12 @@
                                             <action selector="showSignUpInBrowser" destination="syu-Y1-AnQ" eventType="touchUpInside" id="LaY-cG-pau"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BXb-gf-hZH" customClass="FBSDKLoginButton">
+                                        <rect key="frame" x="8" y="194" width="162" height="30"/>
+                                        <state key="normal" title="Login Facebook">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.86666666670000003" green="0.58431372550000005" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
@@ -95,6 +95,7 @@
                     </view>
                     <connections>
                         <outlet property="emailText" destination="KOr-72-28j" id="0ea-YE-jLY"/>
+                        <outlet property="fbLoginButton" destination="BXb-gf-hZH" id="qbA-ch-uow"/>
                         <outlet property="passwordText" destination="pGg-Nc-i8o" id="PpM-Mn-aif"/>
                     </connections>
                 </viewController>
