@@ -12,38 +12,21 @@ import FBSDKLoginKit
 
 class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
 
-    var appDelegate : AppDelegate!
-    
+    // MARK: IB Outlets
     @IBOutlet weak var emailText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
-    
-    
     @IBOutlet weak var fbLoginButton: FBSDKLoginButton!
     
     // MARK: View Controller life cycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         fbLoginButton.delegate = self
-        
-        
-        FBSDKProfile.enableUpdatesOnAccessTokenChange(true)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onTokenUpdated:", name: FBSDKAccessTokenDidChangeNotification, object: nil)
-        
+        println("view did load, do we have a FB token? \(FBSDKAccessToken.currentAccessToken() != nil)")
     }
     
-    func onTokenUpdated(notification: NSNotification) {
-        if ( FBSDKAccessToken.currentAccessToken() != nil) {
-            println("we got a token")
-        } else {
-            println("we lost it")
-        }
-    }
-    
+    // MARK: IB Actions
     @IBAction func showSignUpInBrowser() {
-        let urlString = "https://www.udacity.com/account/auth#!/signin"
-        let url = NSURL(string: urlString)!
+        let url = NSURL(string: APIClient.Constants.UdacitySignUpURL)!
         UIApplication.sharedApplication().openURL(url)
     }
     
@@ -79,16 +62,40 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
                         if let errorMsg = error {
                             println("error fetching publi data: \(errorMsg)")
                         } else {
-                             println("publi data json: \(JSONBody)")
-//                             perform segue
-//                             self.getStudentLocations()
-                            dispatch_async(dispatch_get_main_queue()) {
-                                let tabBarController = self.storyboard!.instantiateViewControllerWithIdentifier("StudentsTabBarController") as! UITabBarController
-                                self.presentViewController(tabBarController, animated: true, completion: nil)
-                            }
+                            self.showTabController()
                         }
                 }
             }
+        }
+    }
+    
+    func loginWithFB() {
+        let jsonParameters : JSONDict = [
+            APIClient.JSONBodyKeys.FBCredential : [
+                APIClient.JSONBodyKeys.FBToken : appDelegate.fbToken!.tokenString
+            ]
+        ]
+        
+        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure, method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(), jsonBody: jsonParameters) {
+        
+            result , error in
+            
+            if let errorMsg = error {
+                println("error: \(errorMsg)")
+            } else {
+                println("result from post: \(result)")
+            }
+        
+        }
+    
+    
+    }
+    
+    func showTabController() {
+        dispatch_async(dispatch_get_main_queue()) {
+            let tabBarController = self.storyboard!.instantiateViewControllerWithIdentifier("StudentsTabBarController") as! UITabBarController
+            self.presentViewController(tabBarController, animated: true, completion: nil)
+            
         }
     }
     
@@ -98,13 +105,11 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
         if let errorMsg = error {
             println("fb loging error: \(errorMsg)")
         } else if result.isCancelled {
-            println("access token: \(FBSDKAccessToken.currentAccessToken())")
-            println("access token: \(FBSDKAccessToken.currentAccessToken().tokenString)")
             println("fb was cancelled by the user")
-            println("fb authorization token: \(result.token!)")
         } else {
-            println("fb authorization token: \(result.token!)")
+            println("access token: \(FBSDKAccessToken.currentAccessToken().tokenString)")
             appDelegate.fbToken = result.token
+            loginWithFB()
         }
     }
     
