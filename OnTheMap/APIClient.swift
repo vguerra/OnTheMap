@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FBSDKCoreKit
 
 enum HttpMethod : String {
     case DELETE = "DELETE", GET = "GET", POST = "POST", PUT = "PUT"
@@ -21,6 +22,11 @@ typealias CompletionClosure = (result: AnyObject!, error: NSError?) -> Void
 class APIClient : NSObject {
 
     let session : NSURLSession
+    // what is known as uniqueKey for the Parse API.
+    var userID : String!
+    var objectID : String?
+    var fbToken : FBSDKAccessToken?
+
     var udacity_account : JSONDict! = nil
     
     override init() {
@@ -51,7 +57,8 @@ class APIClient : NSObject {
                 request.addValue("application/json", forHTTPHeaderField: "Accept")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
                 var jsonifyError: NSError? = nil
-                request.HTTPBody = NSJSONSerialization.dataWithJSONObject(jsonBody, options: nil, error: &jsonifyError)
+                request.HTTPBody = NSJSONSerialization.dataWithJSONObject(jsonBody,
+                    options: nil, error: &jsonifyError)
             }
             
             let task = session.dataTaskWithRequest(request) { data, response, downloadError in
@@ -60,27 +67,23 @@ class APIClient : NSObject {
                     completionHandler(result: nil, error: newError)
                 } else {
                     println("no error, lets parse")
-                    APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!, data: data, completionHandler: completionHandler)
+                    APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!,
+                        data: data, completionHandler: completionHandler)
                 }
             }
             
             task.resume()
-            
             return task
     }
 
-    // MARK: - DELETE
-    
-    func taskForDELETEMethod(baseURL: String, method: String, parameters: URLParametersDict, headers: HeadersDict,
-        completionHandler: CompletionClosure) -> NSURLSessionDataTask {
+    func taskForDELETEMethod(baseURL: String, method: String, parameters: URLParametersDict,
+        headers: HeadersDict, completionHandler: CompletionClosure) -> NSURLSessionDataTask {
         
         return taskForHTTPMethod(.DELETE, baseURL: baseURL,
             method: method, parameters: parameters, httpHeaders: headers,
             jsonBody: JSONDict(), completionHandler: completionHandler)
     }
 
-    
-    // MARK: - GET
     
     func taskForGETMethod(baseURL: String, method: String, parameters: URLParametersDict,
         headers: HeadersDict, completionHandler: CompletionClosure) -> NSURLSessionDataTask {
@@ -91,8 +94,6 @@ class APIClient : NSObject {
        
     }
     
-    // MARK: - POST
-    
     func taskForPOSTMethod(baseURL: String, method: String, parameters: URLParametersDict,
         headers: HeadersDict, jsonBody: JSONDict, completionHandler: CompletionClosure) -> NSURLSessionDataTask {
         
@@ -101,7 +102,6 @@ class APIClient : NSObject {
             jsonBody: jsonBody, completionHandler: completionHandler)
     }
     
-    // MARK: - PUT
     func taskForPUTMethod(baseURL: String, method: String, headers: HeadersDict,
         jsonBody: JSONDict, completionHandler: CompletionClosure) -> NSURLSessionDataTask {
 
@@ -116,7 +116,7 @@ class APIClient : NSObject {
             "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
         ]
         let parameters : URLParametersDict = [
-            "limit" : 100
+            "limit" : APIClient.Constants.defaultNumLocations
         ]
         APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
             if let errorMsg = error {
@@ -248,13 +248,11 @@ class APIClient : NSObject {
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
-        
-        if let parsedResult = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments, error: nil) as? JSONDict {
+        if let parsedResult = NSJSONSerialization.JSONObjectWithData(data!,
+            options: NSJSONReadingOptions.AllowFragments, error: nil) as? JSONDict {
             
             if let errorMessage = parsedResult[APIClient.JSONResponseKeys.StatusMessage] as? String {
-                
                 let userInfo = [NSLocalizedDescriptionKey : errorMessage]
-                
                 return NSError(domain: "TMDB Error", code: 1, userInfo: userInfo)
             }
         }
@@ -262,16 +260,13 @@ class APIClient : NSObject {
     }
     
     /* Helper: Given raw JSON, return a usable Foundation object */
-    class func parseJSONWithCompletionHandler(skipChars: Int, data: NSData, completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
+    class func parseJSONWithCompletionHandler(skipChars: Int, data: NSData, completionHandler: CompletionClosure) {
         
         var parsingError: NSError? = nil
-        println("till here everything ok, we skip \(skipChars)")
-        println("data: \(data)")
         let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(
             APIClient.skipFirstCharsOf(data, skipChars: skipChars),
             options: NSJSONReadingOptions.AllowFragments,
             error: &parsingError)
-        
         if let error = parsingError {
             completionHandler(result: nil, error: error)
         } else {
@@ -289,22 +284,15 @@ class APIClient : NSObject {
 
     /* Helper function: Given a dictionary of parameters, convert to a string for a url */
     class func escapedParameters(parameters: [String : AnyObject]) -> String {
-        
         var urlVars = [String]()
-        
         for (key, value) in parameters {
-            
             /* Make sure that it is a string value */
             let stringValue = "\(value)"
-            
             /* Escape it */
             let escapedValue = stringValue.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
-            
             /* Append it */
             urlVars += [key + "=" + "\(escapedValue!)"]
-            
         }
-        
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
     }
 
@@ -315,13 +303,9 @@ class APIClient : NSObject {
     // MARK: - Shared Instance
     
     class func sharedInstance() -> APIClient {
-        
         struct Singleton {
             static var sharedInstance = APIClient()
         }
-        
         return Singleton.sharedInstance
     }
-
-    
 }
