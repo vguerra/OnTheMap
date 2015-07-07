@@ -18,7 +18,8 @@ extension APIClient {
         ]
         static let parseAppId : String = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
         static let parseRESTAPIKey : String = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
-        static let defaultNumLocations = 100
+        static let defaultLocationsCount = 100
+
     }
     
     struct Methods {
@@ -29,6 +30,17 @@ extension APIClient {
     }
     
     struct ParameterKeys {
+        static let limitKey = "limit"
+    }
+    
+    struct HeaderKeys {
+        static let ParseAppIdKey = "X-Parse-Application-Id"
+        static let ParseAPIKey = "X-Parse-REST-API-Key"
+        static let CookieTokenKey = "X-XSRF-Token"
+        static let BaseHeaders : HeadersDict = [
+            ParseAppIdKey : Constants.parseAppId,
+            ParseAPIKey : Constants.parseRESTAPIKey
+        ]
     }
     
     struct JSONBodyKeys {
@@ -47,6 +59,12 @@ extension APIClient {
         static let AccountKey = "key"
         static let SessionID = "id"
         static let SessionExpiration = "expiration"
+        static let Results = "results"
+        static let ObjectId = "objectId"
+    }
+    
+    struct Cookies {
+        static let CookieTokenName = "UY-XSRF-TOKEN"
     }
 
 }
