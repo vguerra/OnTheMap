@@ -14,8 +14,6 @@ class InfoPostingViewController : UIViewController {
 
 
     @IBOutlet weak var questionLabel: UILabel!
-    
-    
     @IBOutlet weak var locationStringTextArea: UITextView!
     @IBOutlet weak var personalLinkTextArea: UITextView!
     @IBOutlet weak var findMapButton: UIButton!
