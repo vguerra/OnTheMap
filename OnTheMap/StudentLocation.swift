@@ -32,28 +32,23 @@ struct StudentLocation : Printable {
     }
     
     init (dict : [String : AnyObject]) {
-        objectId = dict["objectId"] as? String
-        lastName = dict["lastName"] as! String
-        firstName = dict["firstName"] as! String
-        uniqueKey = dict["uniqueKey"] as! String
-        mapString = dict["mapString"] as! String
-        mediaURL = dict["mediaURL"] as! String
-        latitude = dict["latitude"] as! Float
-        longitude = dict["longitude"] as! Float
+        objectId = dict[APIClient.StudentLocationKey.objectId] as? String
+        lastName = dict[APIClient.StudentLocationKey.lastName] as! String
+        firstName = dict[APIClient.StudentLocationKey.firstName] as! String
+        uniqueKey = dict[APIClient.StudentLocationKey.uniqueKey] as! String
+        mapString = dict[APIClient.StudentLocationKey.mapString] as! String
+        mediaURL = dict[APIClient.StudentLocationKey.mediaURL] as! String
+        latitude = dict[APIClient.StudentLocationKey.latitude] as! Float
+        longitude = dict[APIClient.StudentLocationKey.longitude] as! Float
         
-        let dateFormater = NSDateFormatter()
-        dateFormater.dateStyle = NSDateFormatterStyle.MediumStyle
-        dateFormater.timeStyle = NSDateFormatterStyle.MediumStyle
-        
-//        createdAt = dateFormater.dateFromString(dict["createdAt"] as! String)!
-//        updatedAt = dateFormater.dateFromString(dict["updatedAt"] as! String)!
+        // For the time being we just fill in this dates with the
+        // current date
         createdAt = NSDate()
         updatedAt = NSDate()
     }
     
     static func arrayFromDictionaries(results: [[String:AnyObject]]) -> [StudentLocation] {
         var locations = [StudentLocation]()
-        
         for result in results {
             locations.append(StudentLocation(dict: result))
         }
