@@ -34,7 +34,7 @@ class APIClient : NSObject {
         super.init()
     }
     
-    // MARK: - Task for http methods
+    // MARK: - General Task for http methods
     func taskForHTTPMethod(httpMethod: HttpMethod, baseURL: String, method: String,
         parameters: URLParametersDict, httpHeaders: HeadersDict, jsonBody: JSONDict,
         completionHandler: CompletionClosure) -> NSURLSessionDataTask {
@@ -110,141 +110,6 @@ class APIClient : NSObject {
             jsonBody: jsonBody, completionHandler: completionHandler)
     }
 
-    func getStudentLocations( completionHandler : (locations : [StudentLocation]? , error:NSError?) -> Void ) -> Void {
-        let headers : HeadersDict = [
-            "X-Parse-Application-Id" : Constants.parseAppId,
-            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
-        ]
-        let parameters : URLParametersDict = [
-            "limit" : APIClient.Constants.defaultNumLocations
-        ]
-        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
-            if let errorMsg = error {
-                completionHandler(locations: nil, error: errorMsg)
-            } else {
-                println("students location successful")
-                if let results = JSONBody.valueForKey("results") as? [[String : AnyObject]] {
-                    println("results: \(results)")
-                    completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
-                } else {
-                    println("unable to parse students location response")
-                }
-            }
-        }
-    }
-    
-    func queryStudentLocation(whereDict : [String : AnyObject], completionHandler : (locations : [StudentLocation]?, error : NSError?) -> Void) -> Void {
-
-        let headers : HeadersDict = [
-            "X-Parse-Application-Id" : Constants.parseAppId,
-            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
-        ]
-        
-        // composing where value. 
-        var values = [String]()
-        for (key, value) in whereDict {
-            values.append("\"\(key)\":\"\(value)\"")
-        }
-        
-        var parameters = URLParametersDict()
-        if !values.isEmpty {
-            let whereValues = ",".join(values)
-            parameters["where"] = "{\(whereValues)}"
-        }
-        
-        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
-            if let errorMsg = error {
-                completionHandler(locations: nil, error: errorMsg)
-            } else {
-                println("query student location successful")
-                println("JSONBOdy from query locations: \(JSONBody)")
-                if let results = JSONBody.valueForKey("results") as? [[String : AnyObject]] {
-                    println("results: \(results)")
-                    completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
-                } else {
-                    println("Error querying student locations")
-                
-                }
-            }
-        }
-    }
-
-    func postStudentLocation(studentLocation : StudentLocation, completionHandler : (objectId : String?, error : NSError?) -> Void) -> Void {
-    
-        let headers : HeadersDict = [
-            "X-Parse-Application-Id" : Constants.parseAppId,
-            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
-        ]
-        
-        let jsonBody : JSONDict = [
-            "uniqueKey" : studentLocation.uniqueKey,
-            "firstName" : studentLocation.firstName,
-            "lastName"  : studentLocation.lastName,
-            "mapString" : studentLocation.mapString,
-            "mediaURL"  : studentLocation.mediaURL,
-            "latitude"  : studentLocation.latitude,
-            "longitude" : studentLocation.longitude
-        ]
-        
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
-            JSONBody , error in
-            println("Response from post location: \(JSONBody)")
-            if let errorMsg = error {
-                completionHandler(objectId: nil, error: errorMsg)
-            } else {
-                completionHandler(objectId: (JSONBody.valueForKey("objectId") as! String), error: nil)
-            }
-        }
-    }
-    
-    func putStudentLocation(studentLocation : StudentLocation, completionHandler : (error : NSError?) -> Void) -> Void {
-        let headers : HeadersDict = [
-            "X-Parse-Application-Id" : Constants.parseAppId,
-            "X-Parse-REST-API-Key": Constants.parseRESTAPIKey
-        ]
-        
-        let jsonBody : JSONDict = [
-            "uniqueKey" : studentLocation.uniqueKey,
-            "firstName" : studentLocation.firstName,
-            "lastName"  : studentLocation.lastName,
-            "mapString" : studentLocation.mapString,
-            "mediaURL"  : studentLocation.mediaURL,
-            "latitude"  : studentLocation.latitude,
-            "longitude" : studentLocation.longitude
-        ]
-        
-        let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId, key: "id", value: studentLocation.objectId!)!
-        
-        APIClient.sharedInstance().taskForPUTMethod(APIClient.Constants.ParseURLSecure, method: method, headers: headers, jsonBody: jsonBody) { JSONBody, error in
-            println("Response from put location: \(JSONBody)")            
-            if let errorMsg = error {
-                completionHandler(error: errorMsg)
-            } else {
-                completionHandler(error: nil)
-            }
-        }
-    }
-    
-    func logOutFromUdacity(completionHandler : (error : NSError?) -> Void) -> Void {
-        var headers = HeadersDict()
-        
-        var xsrfCookie : NSHTTPCookie? = nil
-        let sharedCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
-        for cookie in sharedCookieStorage.cookies as! [NSHTTPCookie] {
-            if cookie.name == "UY-XSRF-TOKEN" {
-                headers["X-XSRF-Token"] = cookie.value!
-            }
-        }
-        
-        APIClient.sharedInstance().taskForDELETEMethod(APIClient.Constants.UdacityURLSecure, method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: headers) {JSONBody, error in
-            if let errorMsg = error {
-                completionHandler(error: errorMsg)
-            } else {
-                println("no error")
-                completionHandler(error: nil)
-            }
-        }
-    }
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
@@ -286,11 +151,8 @@ class APIClient : NSObject {
     class func escapedParameters(parameters: [String : AnyObject]) -> String {
         var urlVars = [String]()
         for (key, value) in parameters {
-            /* Make sure that it is a string value */
             let stringValue = "\(value)"
-            /* Escape it */
             let escapedValue = stringValue.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
-            /* Append it */
             urlVars += [key + "=" + "\(escapedValue!)"]
         }
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
