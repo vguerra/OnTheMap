@@ -70,13 +70,13 @@ extension APIClient {
         let headers : HeadersDict = HeaderKeys.BaseHeaders
         
         let jsonBody : JSONDict = [
-            "uniqueKey" : studentLocation.uniqueKey,
-            "firstName" : studentLocation.firstName,
-            "lastName"  : studentLocation.lastName,
-            "mapString" : studentLocation.mapString,
-            "mediaURL"  : studentLocation.mediaURL,
-            "latitude"  : studentLocation.latitude,
-            "longitude" : studentLocation.longitude
+            StudentLocationKey.uniqueKey : studentLocation.uniqueKey,
+            StudentLocationKey.firstName : studentLocation.firstName,
+            StudentLocationKey.lastName  : studentLocation.lastName,
+            StudentLocationKey.mapString : studentLocation.mapString,
+            StudentLocationKey.mediaURL  : studentLocation.mediaURL,
+            StudentLocationKey.latitude  : studentLocation.latitude,
+            StudentLocationKey.longitude : studentLocation.longitude
         ]
         
         APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
@@ -93,13 +93,13 @@ extension APIClient {
         let headers : HeadersDict = HeaderKeys.BaseHeaders
         
         let jsonBody : JSONDict = [
-            "uniqueKey" : studentLocation.uniqueKey,
-            "firstName" : studentLocation.firstName,
-            "lastName"  : studentLocation.lastName,
-            "mapString" : studentLocation.mapString,
-            "mediaURL"  : studentLocation.mediaURL,
-            "latitude"  : studentLocation.latitude,
-            "longitude" : studentLocation.longitude
+            StudentLocationKey.uniqueKey : studentLocation.uniqueKey,
+            StudentLocationKey.firstName : studentLocation.firstName,
+            StudentLocationKey.lastName  : studentLocation.lastName,
+            StudentLocationKey.mapString : studentLocation.mapString,
+            StudentLocationKey.mediaURL  : studentLocation.mediaURL,
+            StudentLocationKey.latitude  : studentLocation.latitude,
+            StudentLocationKey.longitude : studentLocation.longitude
         ]
         
         let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId,
