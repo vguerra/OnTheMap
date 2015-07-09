@@ -22,29 +22,24 @@ class InfoPostingViewController : UIViewController {
     @IBOutlet weak var map: MKMapView!
     
     var studentCoordinates : CLLocationCoordinate2D? = nil
-    var appDelegate : AppDelegate!
     
     // MARK : View life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        
         setUpForAddingLocationString()
         
         locationStringTextArea.text = "Vienna, Austria"
         
         // check if we have already an ObjectId
-        if appDelegate.objectID == nil {
-            APIClient.sharedInstance().queryStudentLocation(["uniqueKey" : appDelegate.userID]) {
+        if APIClient.sharedInstance().objectID == nil {
+            APIClient.sharedInstance().queryStudentLocation([APIClient.StudentLocationKey.uniqueKey : APIClient.sharedInstance().userID]) {
                 locations, error in
-                
                 if let errorMsg = error {
-                    println("error on query: \(errorMsg)")
                 } else {
                     let location = locations![0]
-                    self.appDelegate.objectID = location.objectId
+                    APIClient.sharedInstance().objectID = location.objectId
                     println("found objectID: \(location.objectId)")
                 }
             }
@@ -87,17 +82,17 @@ class InfoPostingViewController : UIViewController {
             var studentDict : [String : AnyObject] = [
                 "lastName" : "Guerra",
                 "firstName" : "Victor",
-                "uniqueKey" : appDelegate.userID!,
+                "uniqueKey" : APIClient.sharedInstance().userID!,
                 "mapString" : locationStringTextArea.text!,
                 "mediaURL" : "http://blg.vg",
                 "latitude" : coordinates.latitude,
                 "longitude" : coordinates.longitude
             ]
             
-            studentDict["objectId"] = (appDelegate.objectID == nil ? "" : appDelegate.objectID!)
+            studentDict["objectId"] = (APIClient.sharedInstance().objectID == nil ? "" : APIClient.sharedInstance().objectID!)
             let studentLocation = StudentLocation(dict: studentDict)
 
-            if let objectId = self.appDelegate.objectID {
+            if let objectId = APIClient.sharedInstance().objectID {
                 println("we go for PUT")
                 APIClient.sharedInstance().putStudentLocation(studentLocation) {
                     error in
@@ -111,7 +106,7 @@ class InfoPostingViewController : UIViewController {
                     if let errorMsg = error {
                         println("error doing post: \(errorMsg)")
                     } else {
-                        self.appDelegate.objectID = objectId
+                        APIClient.sharedInstance().objectID = objectId
                     }
                 }
             }
@@ -131,7 +126,6 @@ class InfoPostingViewController : UIViewController {
         self.personalLinkTextArea.hidden = true
         self.map.hidden = true
         self.submitButton.hidden = true
-        
     }
     
     

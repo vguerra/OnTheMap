@@ -36,59 +36,50 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
             APIClient.JSONBodyKeys.Credential : [
                 APIClient.JSONBodyKeys.Username : emailText.text,
                 APIClient.JSONBodyKeys.Password : passwordText.text
-                ]
+            ]
         ]
         
-        println ("we are about to make the POST request")
         APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
             method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(),
             jsonBody: jsonParameters) { JSONBody, error in
-            
-            if let errorMsg = error {
-                println ("got error: \(errorMsg)")
-            } else {
-                println("json: \(JSONBody)")
-                println(JSONBody.valueForKey(APIClient.JSONResponseKeys.Session))
-                APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
-                let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
-                self.appDelegate.userID = user_id
                 
-                let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
-                println("\(publicDataMethod)")
-                
-                APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.UdacityURLSecure, method: publicDataMethod,
-                    parameters: URLParametersDict(), headers: HeadersDict() ) { JSONBody, error in
-                        
-                        if let errorMsg = error {
-                            println("error fetching publi data: \(errorMsg)")
-                        } else {
-                            self.showTabController()
-                        }
+                if let errorMsg = error {
+                    println ("got error: \(errorMsg)")
+                } else {
+                    APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
+                    let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
+                    APIClient.sharedInstance().userID = user_id
+                    
+                    let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
+                    
+                    APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.UdacityURLSecure,
+                        method: publicDataMethod, parameters: URLParametersDict(),
+                        headers: HeadersDict()) { JSONBody, error in
+                            if let errorMSG = error {
+                            } else {
+                                self.showTabController()
+                            }
+                    }
                 }
-            }
         }
     }
     
     func loginWithFB() {
         let jsonParameters : JSONDict = [
             APIClient.JSONBodyKeys.FBCredential : [
-                APIClient.JSONBodyKeys.FBToken : appDelegate.fbToken!.tokenString
+                APIClient.JSONBodyKeys.FBToken : APIClient.sharedInstance().fbToken!.tokenString
             ]
         ]
         
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure, method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(), jsonBody: jsonParameters) {
-        
-            result , error in
-            
-            if let errorMsg = error {
-                println("error: \(errorMsg)")
-            } else {
-                println("result from post: \(result)")
-            }
-        
+        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
+            method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(),
+            headers: HeadersDict(), jsonBody: jsonParameters) { result , error in
+                if let errorMsg = error {
+                    println("error: \(errorMsg)")
+                } else {
+                    println("result from post: \(result)")
+                }
         }
-    
-    
     }
     
     func showTabController() {
@@ -108,8 +99,7 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
             println("fb was cancelled by the user")
         } else {
             println("access token: \(FBSDKAccessToken.currentAccessToken().tokenString)")
-            appDelegate.fbToken = result.token
-            loginWithFB()
+            APIClient.sharedInstance().fbToken = result.token
         }
     }
     
