@@ -21,7 +21,9 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         fbLoginButton.delegate = self
-        println("view did load, do we have a FB token? \(FBSDKAccessToken.currentAccessToken() != nil)")
+        if let fbToken = FBSDKAccessToken.currentAccessToken()?.tokenString {
+            tryUdacityLoginWithFB(fbToken)
+        }
     }
     
     // MARK: IB Actions
@@ -31,54 +33,19 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     }
     
     @IBAction func tryUdacityLogin(sender: AnyObject) {
-        
-        let jsonParameters : JSONDict = [
-            APIClient.JSONBodyKeys.Credential : [
-                APIClient.JSONBodyKeys.Username : emailText.text,
-                APIClient.JSONBodyKeys.Password : passwordText.text
-            ]
-        ]
-        
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
-            method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(),
-            jsonBody: jsonParameters) { JSONBody, error in
-                
-                if let errorMsg = error {
-                    println ("got error: \(errorMsg)")
-                } else {
-                    APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
-                    let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
-                    APIClient.sharedInstance().userID = user_id
-                    
-                    let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
-                    
-                    APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.UdacityURLSecure,
-                        method: publicDataMethod, parameters: URLParametersDict(),
-                        headers: HeadersDict()) { JSONBody, error in
-                            if let errorMSG = error {
-                            } else {
-                                self.showTabController()
-                            }
-                    }
+        APIClient.sharedInstance().logInToUdacityWithEmail(emailText.text,
+            password: passwordText.text) { result, error in
+                if error == nil {
+                    self.showTabController()
                 }
         }
     }
     
-    func loginWithFB() {
-        let jsonParameters : JSONDict = [
-            APIClient.JSONBodyKeys.FBCredential : [
-                APIClient.JSONBodyKeys.FBToken : APIClient.sharedInstance().fbToken!.tokenString
-            ]
-        ]
-        
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
-            method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(),
-            headers: HeadersDict(), jsonBody: jsonParameters) { result , error in
-                if let errorMsg = error {
-                    println("error: \(errorMsg)")
-                } else {
-                    println("result from post: \(result)")
-                }
+    func tryUdacityLoginWithFB(fbToken: String!) {
+        APIClient.sharedInstance().logInToUdacityWithFBToken(fbToken) {result, error in
+            if error == nil {
+                self.showTabController()
+            }
         }
     }
     
@@ -98,8 +65,7 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
         } else if result.isCancelled {
             println("fb was cancelled by the user")
         } else {
-            println("access token: \(FBSDKAccessToken.currentAccessToken().tokenString)")
-            APIClient.sharedInstance().fbToken = result.token
+            tryUdacityLoginWithFB(result.token.tokenString)
         }
     }
     

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FBSDKCoreKit
 
 enum HttpMethod : String {
     case DELETE = "DELETE", GET = "GET", POST = "POST", PUT = "PUT"
@@ -25,7 +24,7 @@ class APIClient : NSObject {
     // what is known as uniqueKey for the Parse API.
     var userID : String!
     var objectID : String?
-    var fbToken : FBSDKAccessToken?
+    var fbToken : String?
 
     var udacity_account : JSONDict! = nil
     

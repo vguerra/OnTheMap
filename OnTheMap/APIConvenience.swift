@@ -115,6 +115,61 @@ extension APIClient {
         }
     }
     
+    // MARK: Login in and out of udacity.
+    
+    func logInToUdacityWithEmail(email : String, password : String, completionHandler: CompletionClosure) {
+        let jsonParameters : JSONDict = [
+            APIClient.JSONBodyKeys.Credential : [
+                APIClient.JSONBodyKeys.Username : email,
+                APIClient.JSONBodyKeys.Password : password
+            ]
+        ]
+        
+        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
+            method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(),
+            jsonBody: jsonParameters) { JSONBody, error in
+                
+                if let errorMsg = error {
+                    completionHandler(result: nil, error: errorMsg)
+                } else {
+                    APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
+                    let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
+                    APIClient.sharedInstance().userID = user_id
+                    
+                    let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
+                    
+                    APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.UdacityURLSecure,
+                        method: publicDataMethod, parameters: URLParametersDict(),
+                        headers: HeadersDict()) { JSONBody, error in
+                            if let errorMsg = error {
+                                completionHandler(result: nil, error: errorMsg)
+                            } else {
+                                completionHandler(result: JSONBody, error: nil)
+                            }
+                    }
+                }
+        }
+    }
+    
+    func logInToUdacityWithFBToken(fbToken: String!, completionHandler : CompletionClosure) {
+        let jsonParameters : JSONDict = [
+            APIClient.JSONBodyKeys.FBCredential : [
+                APIClient.JSONBodyKeys.FBToken : fbToken
+            ]
+        ]
+        
+        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
+            method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(),
+            headers: HeadersDict(), jsonBody: jsonParameters) { result , error in
+                if let errorMsg = error {
+                    completionHandler(result: nil, error: errorMsg)
+                } else {
+                    APIClient.sharedInstance().fbToken = fbToken
+                    completionHandler(result: result, error: nil)
+                }
+        }
+    }
+    
     func logOutFromUdacity(completionHandler : (error : NSError?) -> Void) -> Void {
         var headers = HeadersDict()
         
