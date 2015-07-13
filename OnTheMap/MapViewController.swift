@@ -16,6 +16,9 @@ class MapViewController : UIViewController, MKMapViewDelegate {
     override func  viewDidLoad() {
         super.viewDidLoad()
         
+        addNavigationBar(self)
+        self.navigationItem.title = "On The Map"
+
         APIClient.sharedInstance.getStudentLocations() { locations, error in
             
             if let locations = locations {

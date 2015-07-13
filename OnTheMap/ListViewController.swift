@@ -7,19 +7,12 @@
 //
 
 import UIKit
-import FBSDKLoginKit
 
 class ListViewController : UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let logoutButton = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain, target: self, action: "logOut")
-        let refreshButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "dummySelector")
-        let locationButton = UIBarButtonItem(image: UIImage(named: "PinIcon"), style: UIBarButtonItemStyle.Plain, target: self, action: "showInfoPostingView")
-        
-        self.navigationItem.setLeftBarButtonItems([logoutButton], animated: true)
-        self.navigationItem.setRightBarButtonItems([refreshButton, locationButton], animated: true)
+        addNavigationBar(self)
         self.navigationItem.title = "On The Map"
     }
     
@@ -47,16 +40,13 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
     func dummySelector() {
         println("dummy proc called")
     }
-    
+
     func logOut() {
-        let fbLoginManager = FBSDKLoginManager()
-        if (FBSDKAccessToken.currentAccessToken() != nil) {
-                fbLoginManager.logOut()
-        }
         APIClient.sharedInstance.logOutFromUdacity() { error in
             if error == nil {
                 self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
     }
+
 }
