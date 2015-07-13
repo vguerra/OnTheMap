@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import FBSDKLoginKit
 
 // This extension encapsulates 
 
@@ -171,6 +171,11 @@ extension APIClient {
     }
     
     func logOutFromUdacity(completionHandler : (error : NSError?) -> Void) -> Void {
+        let fbLoginManager = FBSDKLoginManager()
+        if (FBSDKAccessToken.currentAccessToken() != nil) {
+            fbLoginManager.logOut()
+        }
+
         var headers = HeadersDict()
         
         var xsrfCookie : NSHTTPCookie? = nil
