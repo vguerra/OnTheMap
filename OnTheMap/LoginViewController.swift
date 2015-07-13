@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FBSDKCoreKit
+//import FBSDKCoreKit
 import FBSDKLoginKit
 
 class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
@@ -59,7 +59,6 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     
     // MARK: conforming to FBSDKLoginButtonDelegate protocol
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
-    
         if let errorMsg = error {
             println("fb loging error: \(errorMsg)")
         } else if result.isCancelled {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FBSDKLoginKit
 
 class ListViewController : UIViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -48,9 +49,12 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func logOut() {
+        let fbLoginManager = FBSDKLoginManager()
+        if (FBSDKAccessToken.currentAccessToken() != nil) {
+                fbLoginManager.logOut()
+        }
         APIClient.sharedInstance().logOutFromUdacity() { error in
             if error == nil {
-                println("dismissing view")
                 self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
