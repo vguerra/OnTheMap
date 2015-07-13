@@ -18,7 +18,7 @@ extension APIClient {
         let parameters : URLParametersDict = [
             ParameterKeys.limitKey : Constants.defaultLocationsCount
         ]
-        APIClient.sharedInstance().taskForGETMethod(Constants.ParseURLSecure, method: Methods.StudentLocations,
+        APIClient.sharedInstance.taskForGETMethod(Constants.ParseURLSecure, method: Methods.StudentLocations,
             parameters: parameters, headers: headers) { JSONBody, error in
             if let errorMsg = error {
                 completionHandler(locations: nil, error: errorMsg)
@@ -49,7 +49,7 @@ extension APIClient {
             parameters["where"] = "{\(whereValues)}"
         }
         
-        APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.ParseURLSecure,
+        APIClient.sharedInstance.taskForGETMethod(APIClient.Constants.ParseURLSecure,
             method: APIClient.Methods.StudentLocations, parameters: parameters, headers: headers) { JSONBody, error in
             if let errorMsg = error {
                 completionHandler(locations: nil, error: errorMsg)
@@ -79,7 +79,7 @@ extension APIClient {
             StudentLocationKey.longitude : studentLocation.longitude
         ]
         
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
+        APIClient.sharedInstance.taskForPOSTMethod(APIClient.Constants.ParseURLSecure, method: APIClient.Methods.StudentLocations, parameters: URLParametersDict(), headers: headers, jsonBody: jsonBody) {
             JSONBody , error in
             if let errorMsg = error {
                 completionHandler(objectId: nil, error: errorMsg)
@@ -105,7 +105,7 @@ extension APIClient {
         let method = APIClient.subtituteKeyInMethod(APIClient.Methods.StudentLocationId,
             key: JSONResponseKeys.SessionID, value: studentLocation.objectId!)!
         
-        APIClient.sharedInstance().taskForPUTMethod(APIClient.Constants.ParseURLSecure,
+        APIClient.sharedInstance.taskForPUTMethod(APIClient.Constants.ParseURLSecure,
             method: method, headers: headers, jsonBody: jsonBody) { JSONBody, error in
             if let errorMsg = error {
                 completionHandler(error: errorMsg)
@@ -125,20 +125,20 @@ extension APIClient {
             ]
         ]
         
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
+        APIClient.sharedInstance.taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
             method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(),
             jsonBody: jsonParameters) { JSONBody, error in
                 
                 if let errorMsg = error {
                     completionHandler(result: nil, error: errorMsg)
                 } else {
-                    APIClient.sharedInstance().udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
-                    let user_id = APIClient.sharedInstance().udacity_account["key"] as! String
-                    APIClient.sharedInstance().userID = user_id
+                    APIClient.sharedInstance.udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
+                    let user_id = APIClient.sharedInstance.udacity_account["key"] as! String
+                    APIClient.sharedInstance.userID = user_id
                     
                     let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
                     
-                    APIClient.sharedInstance().taskForGETMethod(APIClient.Constants.UdacityURLSecure,
+                    APIClient.sharedInstance.taskForGETMethod(APIClient.Constants.UdacityURLSecure,
                         method: publicDataMethod, parameters: URLParametersDict(),
                         headers: HeadersDict()) { JSONBody, error in
                             if let errorMsg = error {
@@ -158,13 +158,13 @@ extension APIClient {
             ]
         ]
         
-        APIClient.sharedInstance().taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
+        APIClient.sharedInstance.taskForPOSTMethod(APIClient.Constants.UdacityURLSecure,
             method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(),
             headers: HeadersDict(), jsonBody: jsonParameters) { result , error in
                 if let errorMsg = error {
                     completionHandler(result: nil, error: errorMsg)
                 } else {
-                    APIClient.sharedInstance().fbToken = fbToken
+                    APIClient.sharedInstance.fbToken = fbToken
                     completionHandler(result: result, error: nil)
                 }
         }
@@ -181,7 +181,7 @@ extension APIClient {
             }
         }
         
-        APIClient.sharedInstance().taskForDELETEMethod(APIClient.Constants.UdacityURLSecure,
+        APIClient.sharedInstance.taskForDELETEMethod(APIClient.Constants.UdacityURLSecure,
             method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(),
             headers: headers) {JSONBody, error in
             if let errorMsg = error {

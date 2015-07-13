@@ -16,7 +16,7 @@ class MapViewController : UIViewController, MKMapViewDelegate {
     override func  viewDidLoad() {
         super.viewDidLoad()
         
-        APIClient.sharedInstance().getStudentLocations() { locations, error in
+        APIClient.sharedInstance.getStudentLocations() { locations, error in
             
             if let locations = locations {
                 var annotations = [MKAnnotation]()

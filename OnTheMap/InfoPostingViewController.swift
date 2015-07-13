@@ -33,13 +33,13 @@ class InfoPostingViewController : UIViewController {
         locationStringTextArea.text = "Vienna, Austria"
         
         // check if we have already an ObjectId
-        if APIClient.sharedInstance().objectID == nil {
-            APIClient.sharedInstance().queryStudentLocation([APIClient.StudentLocationKey.uniqueKey : APIClient.sharedInstance().userID]) {
+        if APIClient.sharedInstance.objectID == nil {
+            APIClient.sharedInstance.queryStudentLocation([APIClient.StudentLocationKey.uniqueKey : APIClient.sharedInstance.userID]) {
                 locations, error in
                 if let errorMsg = error {
                 } else {
                     let location = locations![0]
-                    APIClient.sharedInstance().objectID = location.objectId
+                    APIClient.sharedInstance.objectID = location.objectId
                     println("found objectID: \(location.objectId)")
                 }
             }
@@ -82,19 +82,19 @@ class InfoPostingViewController : UIViewController {
             var studentDict : [String : AnyObject] = [
                 "lastName" : "Guerra",
                 "firstName" : "Victor",
-                "uniqueKey" : APIClient.sharedInstance().userID!,
+                "uniqueKey" : APIClient.sharedInstance.userID!,
                 "mapString" : locationStringTextArea.text!,
                 "mediaURL" : "http://blg.vg",
                 "latitude" : coordinates.latitude,
                 "longitude" : coordinates.longitude
             ]
             
-            studentDict["objectId"] = (APIClient.sharedInstance().objectID == nil ? "" : APIClient.sharedInstance().objectID!)
+            studentDict["objectId"] = (APIClient.sharedInstance.objectID == nil ? "" : APIClient.sharedInstance.objectID!)
             let studentLocation = StudentLocation(dict: studentDict)
 
-            if let objectId = APIClient.sharedInstance().objectID {
+            if let objectId = APIClient.sharedInstance.objectID {
                 println("we go for PUT")
-                APIClient.sharedInstance().putStudentLocation(studentLocation) {
+                APIClient.sharedInstance.putStudentLocation(studentLocation) {
                     error in
                     if let errorMsg = error {
                         println("error doing put: \(errorMsg)")
@@ -102,11 +102,11 @@ class InfoPostingViewController : UIViewController {
                 }
             } else {
                 println ("we go for POST")
-                APIClient.sharedInstance().postStudentLocation(studentLocation) { objectId, error in
+                APIClient.sharedInstance.postStudentLocation(studentLocation) { objectId, error in
                     if let errorMsg = error {
                         println("error doing post: \(errorMsg)")
                     } else {
-                        APIClient.sharedInstance().objectID = objectId
+                        APIClient.sharedInstance.objectID = objectId
                     }
                 }
             }

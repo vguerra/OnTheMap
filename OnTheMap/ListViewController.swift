@@ -53,7 +53,7 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
         if (FBSDKAccessToken.currentAccessToken() != nil) {
                 fbLoginManager.logOut()
         }
-        APIClient.sharedInstance().logOutFromUdacity() { error in
+        APIClient.sharedInstance.logOutFromUdacity() { error in
             if error == nil {
                 self.dismissViewControllerAnimated(true, completion: nil)
             }

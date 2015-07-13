@@ -28,6 +28,8 @@ class APIClient : NSObject {
 
     var udacity_account : JSONDict! = nil
     
+    static let sharedInstance = APIClient()
+
     override init() {
         session = NSURLSession.sharedSession()
         super.init()
@@ -163,10 +165,4 @@ class APIClient : NSObject {
     
     // MARK: - Shared Instance
     
-    class func sharedInstance() -> APIClient {
-        struct Singleton {
-            static var sharedInstance = APIClient()
-        }
-        return Singleton.sharedInstance
-    }
 }

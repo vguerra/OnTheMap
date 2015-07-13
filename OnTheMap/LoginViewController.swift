@@ -33,7 +33,7 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     }
     
     @IBAction func tryUdacityLogin(sender: AnyObject) {
-        APIClient.sharedInstance().logInToUdacityWithEmail(emailText.text,
+        APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text,
             password: passwordText.text) { result, error in
                 if error == nil {
                     self.showTabController()
@@ -42,7 +42,7 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     }
     
     func tryUdacityLoginWithFB(fbToken: String!) {
-        APIClient.sharedInstance().logInToUdacityWithFBToken(fbToken) {result, error in
+        APIClient.sharedInstance.logInToUdacityWithFBToken(fbToken) {result, error in
             if error == nil {
                 self.showTabController()
             }
