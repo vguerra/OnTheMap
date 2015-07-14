@@ -8,17 +8,12 @@
 
 import UIKit
 
-class ListViewController : UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ListViewController : UIViewController, UITableViewDataSource, UITableViewDelegate, CommonNavigationBar {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         addNavigationBar(self)
         self.navigationItem.title = "On The Map"
-    }
-    
-    func showInfoPostingView () {
-        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("InfoPostingViewController") as! InfoPostingViewController
-        self.presentViewController(controller, animated: true, completion: nil)
     }
     
     
@@ -39,6 +34,17 @@ class ListViewController : UIViewController, UITableViewDataSource, UITableViewD
     
     func dummySelector() {
         println("dummy proc called")
+    }
+
+    
+    // conforming to CommonNavigationBar protocol
+    func refresh() {
+        println("refreshing")
+    }
+    
+    func showInfoPostingView () {
+        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("InfoPostingViewController") as! InfoPostingViewController
+        self.presentViewController(controller, animated: true, completion: nil)
     }
 
     func logOut() {

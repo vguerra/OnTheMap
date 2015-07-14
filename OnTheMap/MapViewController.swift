@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-class MapViewController : UIViewController, MKMapViewDelegate {
+class MapViewController : UIViewController, MKMapViewDelegate, CommonNavigationBar {
 
     @IBOutlet weak var map: MKMapView!
     
@@ -45,4 +45,22 @@ class MapViewController : UIViewController, MKMapViewDelegate {
         }
     }
     
+    // MARK: conforming to CommonNavigationBar protocol
+    
+    func refresh() {
+        println("refreshing")
+    }
+    
+    func showInfoPostingView () {
+        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("InfoPostingViewController") as! InfoPostingViewController
+        self.presentViewController(controller, animated: true, completion: nil)
+    }
+    
+    func logOut() {
+        APIClient.sharedInstance.logOutFromUdacity() { error in
+            if error == nil {
+                self.dismissViewControllerAnimated(true, completion: nil)
+            }
+        }
+    }
 }
