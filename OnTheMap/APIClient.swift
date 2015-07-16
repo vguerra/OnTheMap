@@ -41,18 +41,13 @@ class APIClient : NSObject {
         completionHandler: CompletionClosure) -> NSURLSessionDataTask {
             
             let urlString = baseURL + method + APIClient.escapedParameters(parameters)
-            println("urlString: \(urlString)")
             let url = NSURL(string: urlString)!
             let request = NSMutableURLRequest(URL: url)
             
             request.HTTPMethod = httpMethod.rawValue
-            println("about to add headers")
             for (headerField , value) in httpHeaders {
-                println("adding to headers")
-                println("\(headerField) : \(value)")
                 request.addValue(value, forHTTPHeaderField: headerField)
             }
-            println("done w/adding headers")
             
             if !jsonBody.isEmpty && httpMethod != .GET {
                 request.addValue("application/json", forHTTPHeaderField: "Accept")
@@ -67,7 +62,6 @@ class APIClient : NSObject {
                     let newError = APIClient.errorForData(data, response: response, error: error)
                     completionHandler(result: nil, error: newError)
                 } else {
-                    println("no error, lets parse")
                     APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!,
                         data: data, completionHandler: completionHandler)
                 }
