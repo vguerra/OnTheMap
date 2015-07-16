@@ -18,7 +18,15 @@ class MapViewController : UIViewController, MKMapViewDelegate, CommonNavigationB
         
         addNavigationBar(self)
         self.navigationItem.title = "On The Map"
+        
+        // reloading 
+        self.refresh()
 
+    }
+    
+    // MARK: conforming to CommonNavigationBar protocol
+    
+    func refresh() {
         APIClient.sharedInstance.getStudentLocations() { locations, error in
             
             if let locations = locations {
@@ -43,12 +51,6 @@ class MapViewController : UIViewController, MKMapViewDelegate, CommonNavigationB
                 println("Error getting locations \(error)")
             }
         }
-    }
-    
-    // MARK: conforming to CommonNavigationBar protocol
-    
-    func refresh() {
-        println("refreshing")
     }
     
     func showInfoPostingView () {
