@@ -19,9 +19,11 @@ class MapViewController : UIViewController, MKMapViewDelegate, CommonNavigationB
         addNavigationBar(self)
         self.navigationItem.title = "On The Map"
         
-        // reloading 
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         self.refresh()
-
     }
     
     // MARK: conforming to CommonNavigationBar protocol
