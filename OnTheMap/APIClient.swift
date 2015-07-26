@@ -8,10 +8,12 @@
 
 import Foundation
 
+// All possible HTTP methods used
 enum HttpMethod : String {
     case DELETE = "DELETE", GET = "GET", POST = "POST", PUT = "PUT"
 }
 
+// Some typealiases to make code more readeble
 typealias URLParametersDict = [String : AnyObject]
 typealias JSONDict = [String : AnyObject]
 typealias HeadersDict = [String : String]
@@ -27,7 +29,9 @@ class APIClient : NSObject {
     var fbToken : String?
 
     var udacity_account : JSONDict! = nil
-    
+    var lastName : String! = nil
+    var firstName : String! = nil
+    var studentLocations : [StudentLocation]? = nil
     static let sharedInstance = APIClient()
 
     override init() {
@@ -59,8 +63,7 @@ class APIClient : NSObject {
             
             let task = session.dataTaskWithRequest(request) { data, response, downloadError in
                 if let error = downloadError {
-                    let newError = APIClient.errorForData(data, response: response, error: error)
-                    completionHandler(result: nil, error: newError)
+                    completionHandler(result: nil, error: error)
                 } else {
                     APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!,
                         data: data, completionHandler: completionHandler)
@@ -106,22 +109,8 @@ class APIClient : NSObject {
     }
 
     
-    /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
-    class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
-        if let parsedResult = NSJSONSerialization.JSONObjectWithData(data!,
-            options: NSJSONReadingOptions.AllowFragments, error: nil) as? JSONDict {
-            
-            if let errorMessage = parsedResult[APIClient.JSONResponseKeys.StatusMessage] as? String {
-                let userInfo = [NSLocalizedDescriptionKey : errorMessage]
-                return NSError(domain: "TMDB Error", code: 1, userInfo: userInfo)
-            }
-        }
-        return error
-    }
-    
-    /* Helper: Given raw JSON, return a usable Foundation object */
+    // Helper: Given raw JSON, return a usable Foundation object
     class func parseJSONWithCompletionHandler(skipChars: Int, data: NSData, completionHandler: CompletionClosure) {
-        
         var parsingError: NSError? = nil
         let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(
             APIClient.skipFirstCharsOf(data, skipChars: skipChars),
@@ -129,6 +118,12 @@ class APIClient : NSObject {
             error: &parsingError)
         if let error = parsingError {
             completionHandler(result: nil, error: error)
+        } else if let errorMessage = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Error) as? String {
+            let userInfo = [NSLocalizedDescriptionKey : errorMessage]
+            let code = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Code) as? Int
+            let status = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Status) as? Int
+            let responseError = NSError(domain: APIClient.Constants.ErrorDomain, code: status ?? code!, userInfo: userInfo)
+            completionHandler(result: nil, error: responseError)
         } else {
             completionHandler(result: parsedResult, error: nil)
         }
@@ -142,7 +137,7 @@ class APIClient : NSObject {
         }
     }
 
-    /* Helper function: Given a dictionary of parameters, convert to a string for a url */
+    // Helper function: Given a dictionary of parameters, convert to a string for a url
     class func escapedParameters(parameters: [String : AnyObject]) -> String {
         var urlVars = [String]()
         for (key, value) in parameters {
@@ -153,10 +148,8 @@ class APIClient : NSObject {
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
     }
 
+    // Helper function: Trimming some leading chars depending on the server we communicate with
     class func skipFirstCharsOf(data: NSData, skipChars: Int) -> NSData {
         return data.subdataWithRange(NSMakeRange( skipChars, data.length - skipChars))
     }
-    
-    // MARK: - Shared Instance
-    
 }
