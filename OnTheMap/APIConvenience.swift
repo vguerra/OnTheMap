@@ -24,9 +24,12 @@ extension APIClient {
                     completionHandler(locations: nil, error: errorMsg)
                 } else {
                     if let results = JSONBody.valueForKey(JSONResponseKeys.Results) as? [[String : AnyObject]] {
-                        completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
+                        APIClient.sharedInstance.studentLocations = StudentLocation.arrayFromDictionaries(results)
+                        completionHandler(locations: APIClient.sharedInstance.studentLocations, error: nil)
                     } else {
-                        println("unable to parse students location response")
+                        let userInfo = [NSLocalizedDescriptionKey : "Not possible to parse results"]
+                        let parseError = NSError(domain: APIClient.Constants.ErrorDomain, code: 1, userInfo: userInfo)
+                        completionHandler(locations: nil, error: parseError)
                     }
                 }
         }
@@ -57,8 +60,9 @@ extension APIClient {
                         if let results = JSONBody.valueForKey(JSONResponseKeys.Results) as? [[String : AnyObject]] {
                             completionHandler(locations: StudentLocation.arrayFromDictionaries(results), error: nil)
                         } else {
-                            println("Error querying student locations")
-                            
+                            let userInfo = [NSLocalizedDescriptionKey : "Not possible to parse results"]
+                            let parseError = NSError(domain: APIClient.Constants.ErrorDomain, code: 1, userInfo: userInfo)
+                            completionHandler(locations: nil, error: parseError)
                         }
                     }
             }
@@ -133,7 +137,7 @@ extension APIClient {
                     completionHandler(result: nil, error: errorMsg)
                 } else {
                     APIClient.sharedInstance.udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
-                    let user_id = APIClient.sharedInstance.udacity_account["key"] as! String
+                    let user_id = APIClient.sharedInstance.udacity_account[APIClient.JSONResponseKeys.AccountKey] as! String
                     APIClient.sharedInstance.userID = user_id
                     
                     let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
@@ -144,6 +148,9 @@ extension APIClient {
                             if let errorMsg = error {
                                 completionHandler(result: nil, error: errorMsg)
                             } else {
+                                let user = JSONBody.valueForKey(APIClient.JSONResponseKeys.User) as! JSONDict
+                                APIClient.sharedInstance.lastName = user[APIClient.JSONResponseKeys.LastName] as! String
+                                APIClient.sharedInstance.firstName = user[APIClient.JSONResponseKeys.FirstName] as! String
                                 completionHandler(result: JSONBody, error: nil)
                             }
                     }
@@ -165,8 +172,8 @@ extension APIClient {
                     completionHandler(result: nil, error: errorMsg)
                 } else {
                     APIClient.sharedInstance.fbToken = fbToken
-                    APIClient.sharedInstance.udacity_account = result.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
-                    let user_id = APIClient.sharedInstance.udacity_account["key"] as! String
+                    APIClient.sharedInstance.udacity_account = result.valueForKey(APIClient.JSONResponseKeys.Account) as! JSONDict
+                    let user_id = APIClient.sharedInstance.udacity_account[APIClient.JSONResponseKeys.AccountKey] as! String
                     APIClient.sharedInstance.userID = user_id
                     
                     let publicDataMethod = APIClient.subtituteKeyInMethod(APIClient.Methods.PublicUserData, key: "id", value: user_id)!
@@ -177,6 +184,9 @@ extension APIClient {
                             if let errorMsg = error {
                                 completionHandler(result: nil, error: errorMsg)
                             } else {
+                                let user = JSONBody.valueForKey(APIClient.JSONResponseKeys.User) as! JSONDict
+                                APIClient.sharedInstance.lastName = user[APIClient.JSONResponseKeys.LastName] as! String
+                                APIClient.sharedInstance.firstName = user[APIClient.JSONResponseKeys.FirstName] as! String
                                 completionHandler(result: JSONBody, error: nil)
                             }
                     }
@@ -210,7 +220,4 @@ extension APIClient {
                 }
         }
     }
-    
-    
-    
 }
