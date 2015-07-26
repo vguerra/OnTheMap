@@ -29,7 +29,8 @@ extension APIClient {
         ]
         static let parseAppId : String = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
         static let parseRESTAPIKey : String = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
-        static let defaultLocationsCount = 100
+        static let defaultLocationsCount : Int = 100
+        static let ErrorDomain : String = "Udacity API"
 
     }
     
@@ -63,7 +64,9 @@ extension APIClient {
     }
     
     struct JSONResponseKeys {
-        static let StatusMessage = "status_message"
+        static let Error = "error"
+        static let Status = "status"
+        static let Code = "code"
         static let Session = "session"
         static let Account = "account"
         static let AccountRegistered = "registered"
@@ -72,6 +75,9 @@ extension APIClient {
         static let SessionExpiration = "expiration"
         static let Results = "results"
         static let ObjectId = "objectId"
+        static let User = "user"
+        static let LastName = "last_name"
+        static let FirstName = "first_name"
     }
     
     struct Cookies {
