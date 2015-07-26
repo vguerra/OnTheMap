@@ -7,22 +7,43 @@
 //
 
 import UIKit
-//import FBSDKCoreKit
 import FBSDKLoginKit
 
-class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
+class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
 
     // MARK: IB Outlets
     @IBOutlet weak var emailText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
     @IBOutlet weak var fbLoginButton: FBSDKLoginButton!
+    @IBOutlet weak var loginButton: BorderedButton!
+    
+    @IBOutlet weak var loginUdacityLabel: UILabel!
+    @IBOutlet weak var noAccountLabel: UILabel!
+    @IBOutlet weak var signUpLabel: UIButton!
+    
+    
+    @IBOutlet weak var logoContainer: UIView!
+    @IBOutlet weak var udacityLoginContainer: UIView!
+    @IBOutlet weak var facebookLoginContainer: UIView!
     
     // MARK: View Controller life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         fbLoginButton.delegate = self
+        configureUI()
+        
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        passwordText.text = ""
+        
+        // If we have a FB Token we log in with it
         if let fbToken = FBSDKAccessToken.currentAccessToken()?.tokenString {
+            fbLoginButton.hidden = true
             tryUdacityLoginWithFB(fbToken)
+        } else {
+            fbLoginButton.hidden = false
         }
     }
     
@@ -33,17 +54,36 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     }
     
     @IBAction func tryUdacityLogin(sender: AnyObject) {
-        APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text,
-            password: passwordText.text) { result, error in
-                if error == nil {
-                    self.showTabController()
-                }
+        if !emailText.text.isEmail() {
+            self.showWarning(title: "Invalid Email 😁",
+                message: "Please verify the email address, it should be a valid one 😉!")
+        }
+        else if passwordText.text.isEmpty {
+            self.showWarning(title: "No password 😔",
+                message: "A password is needed for the log in 😏, please provide one")
+        } else {
+            self.startActivityAnimation(message: "Loging in ")
+            APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text,
+                password: passwordText.text) { result, error in
+                    self.stopActivityAnimation()
+                    if let errorMsg = error  {
+                        self.showWarning(title: "Ups! Logging in didn't work! 😕",
+                            message: errorMsg.localizedDescription)
+                    } else {
+                        self.showTabController()
+                    }
+            }
         }
     }
     
     func tryUdacityLoginWithFB(fbToken: String!) {
+        self.startActivityAnimation(message: "Loging in")
         APIClient.sharedInstance.logInToUdacityWithFBToken(fbToken) {result, error in
-            if error == nil {
+            self.stopActivityAnimation()
+            if let errorMsg = error {
+                self.showWarning(title: "Ups! Logging in didn't work! 😕",
+                    message: errorMsg.localizedDescription)
+            } else {
                 self.showTabController()
             }
         }
@@ -60,15 +100,87 @@ class LoginViewController : UIViewController, FBSDKLoginButtonDelegate {
     // MARK: conforming to FBSDKLoginButtonDelegate protocol
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
         if let errorMsg = error {
-            println("fb loging error: \(errorMsg)")
+            self.showWarning(title: "Facebook Authentication did not work 😓", message: errorMsg.localizedDescription)
         } else if result.isCancelled {
-            println("fb was cancelled by the user")
+            self.showWarning(title: "Something went wrong with Facebook Authentication 😞", message: "Please verify that your Udacity account is connected to your Facebook account and that you grant Udacity permission to access it.")
         } else {
+            self.fbLoginButton.hidden = true
             tryUdacityLoginWithFB(result.token.tokenString)
         }
     }
     
     func loginButtonDidLogOut(loginButton: FBSDKLoginButton!) {
-        println("loging out of FB")
+        // we handle logout differently
+    }
+    
+    // MARK: UI Elements configuration
+    func configureUI() {
+        logoContainer.backgroundColor = UIColor.clearColor()
+        udacityLoginContainer.backgroundColor = UIColor.clearColor()
+        facebookLoginContainer.backgroundColor = UIColor.clearColor()
+        self.view.backgroundColor = UIColor.clearColor()
+
+        // Nice gradient effect for background
+        let colorTop = UIColor(red: 0.980, green: 0.580, blue: 0.040, alpha: 1.0).CGColor
+        let colorBottom = UIColor(red: 0.980, green: 0.440, blue: 0.000, alpha: 1.0).CGColor
+        var backgroundGradient = CAGradientLayer()
+        backgroundGradient.colors = [colorTop, colorBottom]
+        backgroundGradient.locations = [0.0, 1.0]
+        backgroundGradient.frame = view.frame
+        self.view.layer.insertSublayer(backgroundGradient, atIndex: 0)
+
+        
+        // All labels
+        loginUdacityLabel.font = UIFont(name: "Roboto-Medium", size: 22.0)
+        loginUdacityLabel.textColor = UIColor.whiteColor()
+        noAccountLabel.font = UIFont(name: "Roboto-Medium", size: 18.0)
+        noAccountLabel.textColor = UIColor.whiteColor()
+        signUpLabel.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 18.0)
+        signUpLabel.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        
+        // Buttons
+        let loginButtonColor = UIColor(red: 0.960, green: 0.330, blue: 0.0, alpha: 1.0)
+        loginButton.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 16.0)
+        loginButton.backgroundColor = loginButtonColor
+        loginButton.backingColor = loginButtonColor
+        loginButton.highlightedBackingColor = loginButtonColor
+        
+        loginButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+
+        fbLoginButton.titleLabel!.font = UIFont(name: "Roboto-Regular", size: 14.0)
+    
+        // Text Fields
+        let textFieldBGColor = UIColor(red: 0.990, green: 0.780, blue: 0.580, alpha: 1.0)
+        let emailTextFieldPaddingViewFrame = CGRectMake(0.0, 0.0, 13.0, 0.0);
+        let emailTextFieldPaddingView = UIView(frame: emailTextFieldPaddingViewFrame)
+        emailText.backgroundColor = textFieldBGColor
+        emailText.textColor = UIColor.whiteColor()
+        emailText.font = UIFont(name: "Roboto-Medium", size: 14.0)
+        emailText.leftView = emailTextFieldPaddingView
+        emailText.leftViewMode = .Always
+        emailText.attributedPlaceholder = NSAttributedString(string: emailText.placeholder!, attributes: [NSForegroundColorAttributeName : UIColor.whiteColor()])
+        emailText.tintColor = UIColor.whiteColor()
+
+        let passwordTextFieldPaddingViewFrame = CGRectMake(0.0, 0.0, 13.0, 0.0);
+        let passwordTextFieldPaddingView = UIView(frame: passwordTextFieldPaddingViewFrame)
+        passwordText.backgroundColor = textFieldBGColor
+        passwordText.textColor = UIColor.whiteColor()
+        passwordText.font = UIFont(name: "Roboto-Medium", size: 14.0)
+        passwordText.leftView = passwordTextFieldPaddingView
+        passwordText.leftViewMode = .Always
+        passwordText.attributedPlaceholder = NSAttributedString(string: passwordText.placeholder!, attributes: [NSForegroundColorAttributeName : UIColor.whiteColor()])
+        passwordText.tintColor = UIColor.whiteColor()
+    }
+    
+}
+
+
+// for validating an email
+// borrowed from: http://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
+
+extension String {
+    func isEmail() -> Bool {
+        let regex = NSRegularExpression(pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", options: .CaseInsensitive, error: nil)
+        return regex?.firstMatchInString(self, options: nil, range: NSMakeRange(0, count(self))) != nil
     }
 }
