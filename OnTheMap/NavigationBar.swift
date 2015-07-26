@@ -8,7 +8,8 @@
 
 import UIKit
 
-// protocol
+// Protocol definition to which all ViewControllers conform to that want 
+// to have the common NavigationBar
 
 protocol CommonNavigationBar {
     func logOut();
@@ -16,6 +17,7 @@ protocol CommonNavigationBar {
     func showInfoPostingView();
 }
 
+// Helper function that configures the common NavigationBar
 func addNavigationBar(view: CommonNavigationBar) {
     let viewController = view as! UIViewController
     let logoutButton = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain,
