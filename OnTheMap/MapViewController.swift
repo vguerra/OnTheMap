@@ -25,6 +25,8 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
         super.viewDidAppear(animated)
         if APIClient.sharedInstance.studentLocations == nil {
             self.refresh()
+        } else {
+            self.populateMap()
         }
     }
     
@@ -37,7 +39,6 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
     
     // Placing all pins on the map
     func populateMap() {
-        self.map.removeAnnotations(self.map.annotations)
         var annotations = [MKAnnotation]()
         for location in APIClient.sharedInstance.studentLocations! {
             let lat = CLLocationDegrees(location.latitude)
@@ -52,7 +53,11 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
             
             annotations.append(annotation)
         }
-        self.map.addAnnotations(annotations)
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.map.removeAnnotations(self.map.annotations)
+            self.map.addAnnotations(annotations)
+        }
     }
     
     func showInfoPostingView () {
