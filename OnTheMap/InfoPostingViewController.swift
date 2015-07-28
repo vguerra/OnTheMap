@@ -114,23 +114,34 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
                 studentDict["objectId"] = (APIClient.sharedInstance.objectID == nil ? "" : APIClient.sharedInstance.objectID!)
                 let studentLocation = StudentLocation(dict: studentDict)
                 
+                var sendinLocationError = false
                 if let objectId = APIClient.sharedInstance.objectID {
                     APIClient.sharedInstance.putStudentLocation(studentLocation) {
                         error in
                         self.stopActivityAnimation()
                         if let errorMsg = error {
                             self.showWarning(title: "Updating location didn't work 😞", message: errorMsg.localizedDescription)
-                        } else {
-                            self.dismissViewControllerAnimated(true, completion: nil)
+                            sendinLocationError = true
                         }
                     }
                 } else {
                     APIClient.sharedInstance.postStudentLocation(studentLocation) { objectId, error in
-                        self.stopActivityAnimation()
                         if let errorMsg = error {
+                            self.stopActivityAnimation()
                             self.showWarning(title: "Sending location didn't work 😞", message: errorMsg.localizedDescription)
+                            sendinLocationError = true
                         } else {
                             APIClient.sharedInstance.objectID = objectId
+                        }
+                    }
+                }
+                
+                if !sendinLocationError {
+                    APIClient.sharedInstance.getStudentLocations() { locations, error in
+                        self.stopActivityAnimation()
+                        if let errorMsg = error {
+                            self.showWarning(title: "Getting Student locations didn't work 😞", message: errorMsg.localizedDescription)
+                        } else {
                             self.dismissViewControllerAnimated(true, completion: nil)
                         }
                     }
