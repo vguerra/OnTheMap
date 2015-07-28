@@ -30,7 +30,17 @@ struct StudentLocation : Printable {
     let updatedAt : NSDate
     // conforming to Printable Protocol
     var description : String {
-        return ""
+        let desc : [String: AnyObject] = [
+            APIClient.StudentLocationKey.objectId : objectId!,
+            APIClient.StudentLocationKey.lastName : lastName,
+            APIClient.StudentLocationKey.firstName : firstName,
+            APIClient.StudentLocationKey.uniqueKey : uniqueKey,
+            APIClient.StudentLocationKey.mapString : mapString,
+            APIClient.StudentLocationKey.mediaURL : mediaURL,
+            APIClient.StudentLocationKey.latitude : latitude,
+            APIClient.StudentLocationKey.longitude : longitude
+        ]
+        return desc.description
     }
     
     // Initialization from a dictionary
@@ -58,6 +68,5 @@ struct StudentLocation : Printable {
         }
         return locations
     }
-
 }
 
