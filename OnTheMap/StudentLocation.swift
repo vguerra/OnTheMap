@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MapKit
 
 // Structure that represents an Student Location
 
@@ -67,6 +68,22 @@ struct StudentLocation : Printable {
             locations.append(StudentLocation(dict: result))
         }
         return locations
+    }
+}
+
+// In order to use StudentLocation object almost as a MKAnnotation
+extension StudentLocation {
+    var title : String {
+        return "\(firstName) \(lastName)"
+    }
+    
+    var subtitle : String {
+        return mediaURL
+    }
+    
+    var coordinate : CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude) ,
+            longitude: CLLocationDegrees(longitude))
     }
 }
 
