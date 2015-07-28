@@ -24,6 +24,8 @@ class ListViewController : SLViewController, UITableViewDataSource, UITableViewD
         super.viewWillAppear(animated)
         if APIClient.sharedInstance.studentLocations == nil {
             self.refresh()
+        } else {
+            self.locationsTable.reloadData()
         }
     }
     
