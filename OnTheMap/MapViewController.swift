@@ -21,8 +21,8 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
         map.delegate = self
     }
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         if APIClient.sharedInstance.studentLocations == nil {
             self.refresh()
         } else {
@@ -32,31 +32,25 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
     
     // MARK: conforming to CommonNavigationBar protocol
     func refresh() {
-        refreshLocationsWihtHandler() {
+        self.refreshLocationsWihtHandler() {
             self.populateMap()
         }
     }
     
     // Placing all pins on the map
     func populateMap() {
-        var annotations = [MKAnnotation]()
-        for location in APIClient.sharedInstance.studentLocations! {
-            let lat = CLLocationDegrees(location.latitude)
-            let long = CLLocationDegrees(location.longitude)
-            
-            let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
-            
-            var annotation = MKPointAnnotation()
-            annotation.coordinate = coordinate
-            annotation.title = "\(location.firstName) \(location.lastName)"
-            annotation.subtitle = location.mediaURL
-            
-            annotations.append(annotation)
-        }
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.map.removeAnnotations(self.map.annotations)
-            self.map.addAnnotations(annotations)
+        if let studenLocations = APIClient.sharedInstance.studentLocations {
+            var annotations : [MKAnnotation] = studenLocations.map() {
+                let pAnnotation = MKPointAnnotation()
+                pAnnotation.title = $0.title
+                pAnnotation.subtitle = $0.mediaURL
+                pAnnotation.coordinate = $0.coordinate
+                return pAnnotation
+            }
+            dispatch_async(dispatch_get_main_queue()) {
+                self.map.removeAnnotations(self.map.annotations)
+                self.map.addAnnotations(annotations)
+            }
         }
     }
     
@@ -81,6 +75,7 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.canShowCallout = true
+            pinView!.animatesDrop = false
             pinView!.pinColor = .Red
             pinView!.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
         }

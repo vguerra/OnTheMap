@@ -54,7 +54,7 @@ class ListViewController : SLViewController, UITableViewDataSource, UITableViewD
     
     // MARK: conforming to CommonNavigationBar protocol
     func refresh() {
-        refreshLocationsWihtHandler() {
+        self.refreshLocationsWihtHandler() {
             self.locationsTable.reloadData()
         }
     }
