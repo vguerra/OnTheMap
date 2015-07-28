@@ -221,6 +221,9 @@ extension APIClient {
                 if let errorMsg = error {
                     completionHandler(error: errorMsg)
                 } else {
+                    APIClient.sharedInstance.fbToken = nil
+                    APIClient.sharedInstance.objectID = nil
+                    APIClient.sharedInstance.studentLocations = nil
                     completionHandler(error: nil)
                 }
         }
