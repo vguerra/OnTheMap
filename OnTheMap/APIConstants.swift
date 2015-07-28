@@ -9,14 +9,14 @@
 extension APIClient {
 
     struct StudentLocationKey {
-        static let uniqueKey = "uniqueKey"
-        static let firstName = "firstName"
-        static let lastName = "lastName"
-        static let mapString = "mapString"
-        static let mediaURL = "mediaURL"
-        static let latitude = "latitude"
-        static let longitude = "longitude"
-        static let objectId = "objectId"
+        static let uniqueKey : String = "uniqueKey"
+        static let firstName : String = "firstName"
+        static let lastName : String = "lastName"
+        static let mapString : String = "mapString"
+        static let mediaURL : String = "mediaURL"
+        static let latitude : String = "latitude"
+        static let longitude : String = "longitude"
+        static let objectId : String = "objectId"
     }
     
     struct Constants {
@@ -30,6 +30,7 @@ extension APIClient {
         static let parseAppId : String = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
         static let parseRESTAPIKey : String = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
         static let defaultLocationsCount : Int = 100
+        static let OrderByField : String = "-updatedAt"
         static let ErrorDomain : String = "Udacity API"
 
     }
@@ -43,6 +44,7 @@ extension APIClient {
     
     struct ParameterKeys {
         static let limitKey = "limit"
+        static let orderKey = "order"
     }
     
     struct HeaderKeys {

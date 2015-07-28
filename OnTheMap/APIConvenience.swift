@@ -16,7 +16,8 @@ extension APIClient {
     func getStudentLocations( completionHandler : (locations : [StudentLocation]? , error:NSError?) -> Void ) -> Void {
         let headers : HeadersDict = HeaderKeys.BaseHeaders
         let parameters : URLParametersDict = [
-            ParameterKeys.limitKey : Constants.defaultLocationsCount
+            ParameterKeys.limitKey : Constants.defaultLocationsCount,
+            ParameterKeys.orderKey : Constants.OrderByField
         ]
         APIClient.sharedInstance.taskForGETMethod(Constants.ParseURLSecure, method: Methods.StudentLocations,
             parameters: parameters, headers: headers) { JSONBody, error in
@@ -46,7 +47,11 @@ extension APIClient {
                 values.append("\"\(key)\":\"\(value)\"")
             }
             
-            var parameters = URLParametersDict()
+            var parameters : URLParametersDict = [
+                ParameterKeys.limitKey : Constants.defaultLocationsCount,
+                ParameterKeys.orderKey : Constants.OrderByField
+            ]
+
             if !values.isEmpty {
                 let whereValues = ",".join(values)
                 parameters["where"] = "{\(whereValues)}"
