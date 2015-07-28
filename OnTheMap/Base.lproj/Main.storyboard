@@ -216,7 +216,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="emo-z2-jaZ">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="emo-z2-jaZ">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
@@ -242,6 +242,12 @@
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="emo-z2-jaZ" secondAttribute="trailing" constant="-16" id="2CT-F0-QyX"/>
+                            <constraint firstItem="emo-z2-jaZ" firstAttribute="top" secondItem="k3N-Rr-PfT" secondAttribute="topMargin" id="L1Q-z6-vIq"/>
+                            <constraint firstItem="emo-z2-jaZ" firstAttribute="bottom" secondItem="k3N-Rr-PfT" secondAttribute="bottomMargin" id="XpR-oP-RzC"/>
+                            <constraint firstItem="emo-z2-jaZ" firstAttribute="leading" secondItem="k3N-Rr-PfT" secondAttribute="leadingMargin" constant="-16" id="jEM-hv-X19"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" image="ListIcon" id="jI2-RP-loC"/>
                     <navigationItem key="navigationItem" id="Dj6-MB-1EV"/>
@@ -455,7 +461,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="YnR-fO-87g">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="YnR-fO-87g">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <connections>
                                     <outlet property="delegate" destination="wMN-CL-mJb" id="81E-8x-Psc"/>
@@ -463,6 +469,12 @@
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="YnR-fO-87g" firstAttribute="bottom" secondItem="iKO-4y-l1O" secondAttribute="bottomMargin" id="1UD-z3-YI2"/>
+                            <constraint firstItem="YnR-fO-87g" firstAttribute="leading" secondItem="iKO-4y-l1O" secondAttribute="leadingMargin" constant="-16" id="AQu-gd-CET"/>
+                            <constraint firstItem="YnR-fO-87g" firstAttribute="top" secondItem="iKO-4y-l1O" secondAttribute="topMargin" id="PUe-aA-jfb"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="YnR-fO-87g" secondAttribute="trailing" constant="-16" id="YLq-1w-bqM"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" image="MapIcon" id="vaW-Gp-RuS"/>
                     <navigationItem key="navigationItem" id="6gR-fO-1gr"/>
