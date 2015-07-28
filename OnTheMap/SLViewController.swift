@@ -65,16 +65,20 @@ class SLViewController : UIViewController {
     }
     
     // Helper that fetches locations from the server and executes a hanlder
+    // this code runs always on the background
     func refreshLocationsWihtHandler(handler: ()->Void) {
-        self.startActivityAnimation(message: "Loading locations")
-        APIClient.sharedInstance.getStudentLocations() { locations, error in
-            if let errorMsg = error {
-                self.stopActivityAnimation()
-                self.showWarning(title: "Attempt to fetch classmates locations failed 😢",
-                    message: errorMsg.localizedDescription)
-            } else {
-                handler()
-                self.stopActivityAnimation()
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            
+            self.startActivityAnimation(message: "Loading locations")
+            APIClient.sharedInstance.getStudentLocations() { locations, error in
+                if let errorMsg = error {
+                    self.stopActivityAnimation()
+                    self.showWarning(title: "Attempt to fetch classmates locations failed 😢",
+                        message: errorMsg.localizedDescription)
+                } else {
+                    handler()
+                    self.stopActivityAnimation()
+                }
             }
         }
     }
