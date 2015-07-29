@@ -126,7 +126,8 @@ extension APIClient {
     
     // MARK: Login in and out of udacity.
     
-    func logInToUdacityWithEmail(email : String, password : String, completionHandler: CompletionClosure) {
+    func logInToUdacityWithEmail(email : String, password : String, networkErrorHandler: onErrorClosure,
+        responseErrorHandler: onErrorClosure, completionHandler: CompletionClosure) {
         let jsonParameters : JSONDict = [
             APIClient.JSONBodyKeys.Credential : [
                 APIClient.JSONBodyKeys.Username : email,
@@ -138,9 +139,19 @@ extension APIClient {
             method: APIClient.Methods.AuthenticationSession, parameters: URLParametersDict(), headers: HeadersDict(),
             jsonBody: jsonParameters) { JSONBody, error in
                 
-                if let errorMsg = error {
-                    completionHandler(result: nil, error: errorMsg)
-                } else {
+                switch (JSONBody, error) {
+
+                case let (.None, .None):
+                    break
+                    
+                case let (.None, .Some(errorMsg)):
+                    networkErrorHandler(error: errorMsg)
+                
+                case let (.Some(JSONBody), .Some(errorMsg)):
+                    responseErrorHandler(error: errorMsg)
+                
+                case let (.Some(JSONBody), .None):
+                    
                     APIClient.sharedInstance.udacity_account = JSONBody.valueForKey(APIClient.JSONResponseKeys.Account) as? JSONDict
                     let user_id = APIClient.sharedInstance.udacity_account[APIClient.JSONResponseKeys.AccountKey] as! String
                     APIClient.sharedInstance.userID = user_id
@@ -150,9 +161,19 @@ extension APIClient {
                     APIClient.sharedInstance.taskForGETMethod(APIClient.Constants.UdacityURLSecure,
                         method: publicDataMethod, parameters: URLParametersDict(),
                         headers: HeadersDict()) { JSONBody, error in
-                            if let errorMsg = error {
-                                completionHandler(result: nil, error: errorMsg)
-                            } else {
+                            
+                            switch(JSONBody, error) {
+
+                            case let (.None, .None):
+                                break
+
+                            case let (.None, .Some(errorMsg)):
+                                networkErrorHandler(error: errorMsg)
+
+                            case let (.Some(JSONBody), .Some(errorMsg)):
+                                responseErrorHandler(error: errorMsg)
+
+                            case let (.Some(JSONBody), .None):
                                 let user = JSONBody.valueForKey(APIClient.JSONResponseKeys.User) as! JSONDict
                                 APIClient.sharedInstance.lastName = user[APIClient.JSONResponseKeys.LastName] as! String
                                 APIClient.sharedInstance.firstName = user[APIClient.JSONResponseKeys.FirstName] as! String
