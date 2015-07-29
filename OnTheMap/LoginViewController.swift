@@ -9,7 +9,7 @@
 import UIKit
 import FBSDKLoginKit
 
-class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
+class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFieldDelegate {
 
     // MARK: IB Outlets
     @IBOutlet weak var emailText: UITextField!
@@ -19,12 +19,14 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
     
     @IBOutlet weak var loginUdacityLabel: UILabel!
     @IBOutlet weak var noAccountLabel: UILabel!
+    @IBOutlet weak var loginErrorLabel: UILabel!
     @IBOutlet weak var signUpLabel: UIButton!
     
     
     @IBOutlet weak var logoContainer: UIView!
     @IBOutlet weak var udacityLoginContainer: UIView!
     @IBOutlet weak var facebookLoginContainer: UIView!
+    @IBOutlet weak var errorContainer: UIView!
     
     // MARK: View Controller life cycle
     override func viewDidLoad() {
@@ -32,6 +34,8 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
         fbLoginButton.delegate = self
         configureUI()
         
+        emailText.delegate = self
+        passwordText.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -45,6 +49,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
         } else {
             fbLoginButton.hidden = false
         }
+        hideError()
     }
     
     // MARK: IB Actions
@@ -54,6 +59,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
     }
     
     @IBAction func tryUdacityLogin(sender: AnyObject) {
+        hideError()
         if !emailText.text.isEmail() {
             self.showWarning(title: "Invalid Email 😁",
                 message: "Please verify the email address, it should be a valid one 😉!")
@@ -62,21 +68,29 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
             self.showWarning(title: "No password 😔",
                 message: "A password is needed for the log in 😏, please provide one")
         } else {
-            self.startActivityAnimation(message: "Loging in ")
-            APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text,
-                password: passwordText.text) { result, error in
-                    self.stopActivityAnimation()
-                    if let errorMsg = error  {
-                        self.showWarning(title: "Ups! Logging in didn't work! 😕",
-                            message: errorMsg.localizedDescription)
-                    } else {
-                        self.showTabController()
-                    }
+            let networkErrorClosure : onErrorClosure = { error in
+                self.stopActivityAnimation()
+                self.showError(message: "Oh no! Network Error: \(error!.localizedDescription)")
             }
+            
+            let loginErrorClosure : onErrorClosure = { error in
+                self.stopActivityAnimation()
+                self.showError(message: "Oh no! Log in failed: \(error!.localizedDescription)")
+            }
+            
+            let successClosure : CompletionClosure = { result, error in
+                self.stopActivityAnimation()
+                self.showTabController()
+            }
+            
+            self.startActivityAnimation(message: "Logging in ")
+            APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text, password: passwordText.text, networkErrorHandler: networkErrorClosure, responseErrorHandler: loginErrorClosure, completionHandler: successClosure)
+            
         }
     }
     
     func tryUdacityLoginWithFB(fbToken: String!) {
+        hideError()
         self.startActivityAnimation(message: "Loging in")
         APIClient.sharedInstance.logInToUdacityWithFBToken(fbToken) {result, error in
             self.stopActivityAnimation()
@@ -113,11 +127,23 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
         // we handle logout differently
     }
     
+    func hideError() {
+        self.errorContainer.hidden = true
+    }
+    func showError(#message: String) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.errorContainer.hidden = false
+            self.loginErrorLabel.text = message
+            self.loginErrorLabel.sizeToFit()
+        }
+    }
+    
     // MARK: UI Elements configuration
     func configureUI() {
         logoContainer.backgroundColor = UIColor.clearColor()
         udacityLoginContainer.backgroundColor = UIColor.clearColor()
         facebookLoginContainer.backgroundColor = UIColor.clearColor()
+        errorContainer.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
 
         // Nice gradient effect for background
@@ -137,6 +163,8 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
         noAccountLabel.textColor = UIColor.whiteColor()
         signUpLabel.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 18.0)
         signUpLabel.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        loginErrorLabel.font = UIFont(name: "Roboto-Regular", size: 16.0)
+        loginErrorLabel.textColor = UIColor.whiteColor()
         
         // Buttons
         let loginButtonColor = UIColor(red: 0.960, green: 0.330, blue: 0.0, alpha: 1.0)
@@ -170,6 +198,12 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate {
         passwordText.leftViewMode = .Always
         passwordText.attributedPlaceholder = NSAttributedString(string: passwordText.placeholder!, attributes: [NSForegroundColorAttributeName : UIColor.whiteColor()])
         passwordText.tintColor = UIColor.whiteColor()
+    }
+    
+    // MARK: conforming to UITextField Delegate protocol
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
     }
     
 }
