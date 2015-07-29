@@ -18,7 +18,7 @@ typealias URLParametersDict = [String : AnyObject]
 typealias JSONDict = [String : AnyObject]
 typealias HeadersDict = [String : String]
 typealias CompletionClosure = (result: AnyObject!, error: NSError?) -> Void
-
+typealias onErrorClosure = (error: NSError?) -> Void
 
 class APIClient : NSObject {
 
@@ -123,7 +123,7 @@ class APIClient : NSObject {
             let code = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Code) as? Int
             let status = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Status) as? Int
             let responseError = NSError(domain: APIClient.Constants.ErrorDomain, code: status ?? code!, userInfo: userInfo)
-            completionHandler(result: nil, error: responseError)
+            completionHandler(result: parsedResult, error: responseError)
         } else {
             completionHandler(result: parsedResult, error: nil)
         }
