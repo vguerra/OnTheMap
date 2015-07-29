@@ -10,50 +10,43 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class InfoPostingViewController : SLViewController, UITextViewDelegate {
+class InfoPostingViewController : SLViewController, UITextFieldDelegate {
 
     @IBOutlet weak var question1Label: UILabel!
     @IBOutlet weak var question2Label: UILabel!
     @IBOutlet weak var question3Label: UILabel!
     
-    @IBOutlet weak var personalLinkTextArea: UITextView!
-    @IBOutlet weak var locationStringTextArea: UITextView!
+    @IBOutlet weak var personalLinkTextField: UITextField!
+    @IBOutlet weak var locationStringTextField: UITextField!
+    
     @IBOutlet weak var findMapButton: BorderedButton!
     @IBOutlet weak var submitButton: BorderedButton!
     @IBOutlet weak var cancelButton: BorderedButton!
     
     @IBOutlet weak var upperContainer: UIView!
     @IBOutlet weak var lowerContainer: UIView!
+    @IBOutlet weak var locationContainer: UIView!
+    
     @IBOutlet weak var map: MKMapView!
     
     var studentCoordinates : CLLocationCoordinate2D? = nil
-    
-    // Text used as placeholders for the Text areas
-    let personalLinkPlaceholder = "Enter a Link to share here"
-    let locationStringPlaceholder = "Enter your Location here"
     
     // MARK : View life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        personalLinkTextField!.delegate = self
+        locationStringTextField!.delegate = self
         configureUI()
         setUpForAddingLocationString()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        applyPlaceholderStyle(personalLinkTextArea, placeholderText: personalLinkPlaceholder)
-        applyPlaceholderStyle(locationStringTextArea, placeholderText: locationStringPlaceholder)
-        
-        locationStringTextArea.addObserver(self, forKeyPath: "contentSize", options: .New, context: nil)
-        personalLinkTextArea.addObserver(self, forKeyPath: "contentSize", options: .New, context: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        locationStringTextArea.removeObserver(self, forKeyPath: "contentSize")
-        personalLinkTextArea.removeObserver(self, forKeyPath: "contentSize")
     }
     
     
@@ -63,11 +56,11 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
     }
     
     @IBAction func findMapButtonTouchUp() {
-        if locationStringTextArea.text == locationStringPlaceholder || locationStringTextArea.text.isEmpty {
+        if locationStringTextField.text.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Your location is need, please enter it 😉")
         } else {
             self.startActivityAnimation(message: "Decoding location")
-            let locationString = locationStringTextArea.text
+            let locationString = locationStringTextField.text
             
             let geoCoder = CLGeocoder()
             
@@ -94,9 +87,9 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
     }
     
     @IBAction func submitButtonTouchUp() {
-        if personalLinkTextArea.text == personalLinkPlaceholder || personalLinkTextArea.text.isEmpty {
+        if personalLinkTextField.text.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Your fellow students would like to know about you, enter a personal link please! ☺️")
-        } else if !verifyUrl(personalLinkTextArea.text) {
+        } else if !verifyUrl(personalLinkTextField.text) {
             self.showWarning(title: "That link seems wrong 😕", message: "Please enter a valid one ☺️")
         } else {
             self.startActivityAnimation(message: "Sending location")
@@ -105,8 +98,8 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
                     APIClient.StudentLocationKey.lastName : APIClient.sharedInstance.lastName,
                     APIClient.StudentLocationKey.firstName : APIClient.sharedInstance.firstName,
                     APIClient.StudentLocationKey.uniqueKey : APIClient.sharedInstance.userID!,
-                    APIClient.StudentLocationKey.mapString : locationStringTextArea.text!,
-                    APIClient.StudentLocationKey.mediaURL : personalLinkTextArea.text!,
+                    APIClient.StudentLocationKey.mapString : locationStringTextField.text!,
+                    APIClient.StudentLocationKey.mediaURL : personalLinkTextField.text!,
                     APIClient.StudentLocationKey.latitude : coordinates.latitude,
                     APIClient.StudentLocationKey.longitude : coordinates.longitude
                 ]
@@ -168,13 +161,16 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
         self.question1Label.hidden = false
         self.question2Label.hidden = false
         self.question3Label.hidden = false
-        self.locationStringTextArea.hidden = false
+        self.locationStringTextField.hidden = false
         self.findMapButton.hidden = false
+        self.locationContainer.hidden = false
         
         // All UI elements that need to be hidden
-        self.personalLinkTextArea.hidden = true
+        self.personalLinkTextField.hidden = true
         self.map.hidden = true
         self.submitButton.hidden = true
+        
+        upperContainer.backgroundColor = UIColor(red: 0.850, green: 0.850, blue: 0.850, alpha: 1.0)
     }
     
     
@@ -184,13 +180,16 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
         self.question1Label.hidden = true
         self.question2Label.hidden = true
         self.question3Label.hidden = true
-        self.locationStringTextArea.hidden = true
+        self.locationStringTextField.hidden = true
         self.findMapButton.hidden = true
+        self.locationContainer.hidden = true
         
         // All UI elements that need to be hidden
-        self.personalLinkTextArea.hidden = false
+        self.personalLinkTextField.hidden = false
         self.map.hidden = false
         self.submitButton.hidden = false
+        
+        upperContainer.backgroundColor = UIColor(red: 0.250, green: 0.450, blue: 0.660, alpha: 1.0)
     }
     
     func configureUI() {
@@ -201,6 +200,7 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
     
         lowerContainer.backgroundColor = grayColor
         upperContainer.backgroundColor = grayColor
+        locationContainer.backgroundColor = blueColor
         
         // buttons
         findMapButton.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 16.0)
@@ -230,16 +230,17 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
         question3Label.font = UIFont(name: "Roboto-Thin", size: 20.0)
         
         // TextFields
-        locationStringTextArea.backgroundColor = blueColor
-        locationStringTextArea.textColor = whiteColor
-        locationStringTextArea.font = UIFont(name: "Roboto-Medium", size: 18.0)
-        locationStringTextArea.tintColor = whiteColor
-        
-        personalLinkTextArea.backgroundColor = blueColor
-        personalLinkTextArea.textColor = whiteColor
-        personalLinkTextArea.font = UIFont(name: "Roboto-Medium", size: 18.0)
-        personalLinkTextArea.tintColor = whiteColor
-        
+        locationStringTextField.backgroundColor = blueColor
+        locationStringTextField.textColor = whiteColor
+        locationStringTextField.font = UIFont(name: "Roboto-Medium", size: 18.0)
+        locationStringTextField.tintColor = whiteColor
+        locationStringTextField.attributedPlaceholder = NSAttributedString(string: locationStringTextField.placeholder!, attributes: [NSForegroundColorAttributeName: grayColor])
+
+        personalLinkTextField.backgroundColor = blueColor
+        personalLinkTextField.textColor = whiteColor
+        personalLinkTextField.font = UIFont(name: "Roboto-Medium", size: 18.0)
+        personalLinkTextField.tintColor = whiteColor
+        personalLinkTextField.attributedPlaceholder = NSAttributedString(string: personalLinkTextField.placeholder!, attributes: [NSForegroundColorAttributeName: grayColor])
     }
     
     // Small helper to verify valid URLs
@@ -251,54 +252,12 @@ class InfoPostingViewController : SLViewController, UITextViewDelegate {
         }
         return false
     }
-    
-    // MARK: Conforming to UITextViewDelegate and custom placeholder functionality
-    // Based on this post: https://grokswift.com/uitextview-placeholder/
-    func textViewShouldBeginEditing(textView: UITextView) -> Bool {
-        if textView.text == personalLinkPlaceholder || textView.text == locationStringPlaceholder {
-            moveCursorToStart(textView)
-        }
-        return true
-    }
 
-    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
-        let newLength = count("textView.text".utf16) + count(text.utf16) - range.length
-        if newLength > 0 {
-            if textView.text == personalLinkPlaceholder || textView.text == locationStringPlaceholder {
-                if count(text.utf16) == 0 {
-                    return false
-                }
-                applyNonPlaceholderStyle(textView)
-                textView.text = ""
-            }
-            return true
-        } else {
-            if textView == personalLinkTextArea {
-                applyPlaceholderStyle(textView, placeholderText: personalLinkPlaceholder)
-            } else {
-                applyPlaceholderStyle(textView, placeholderText: locationStringPlaceholder)
-            }
-            moveCursorToStart(textView)
-            return false
-        }
+    // MARK: conforming to UITextField Delegate protocol
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
     }
-    
-    func applyPlaceholderStyle(textView: UITextView, placeholderText: String) {
-        textView.textColor = UIColor.lightGrayColor()
-        textView.text = placeholderText
-    }
-    
-    func applyNonPlaceholderStyle(textView: UITextView) {
-        textView.textColor = UIColor.whiteColor()
-        textView.alpha = 1.0
-    }
-    
-    func moveCursorToStart(textView: UITextView) {
-        dispatch_async(dispatch_get_main_queue(), {
-            textView.selectedRange = NSMakeRange(0, 0);
-        })
-    }
-    
-    
     
 }
+
