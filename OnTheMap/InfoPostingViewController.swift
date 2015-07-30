@@ -59,7 +59,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
         if locationStringTextField.text.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Your location is need, please enter it 😉")
         } else {
-            self.startActivityAnimation(message: "Decoding location")
+            self.startActivityAnimation(message: "Geocoding location")
             let locationString = locationStringTextField.text
             
             let geoCoder = CLGeocoder()

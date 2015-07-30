@@ -70,12 +70,12 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
         } else {
             let networkErrorClosure : onErrorClosure = { error in
                 self.stopActivityAnimation()
-                self.showError(message: "Oh no! Network Error: \(error!.localizedDescription)")
+                self.showError(message: "Network Error: \(error!.localizedDescription). Please, try again!")
             }
             
             let loginErrorClosure : onErrorClosure = { error in
                 self.stopActivityAnimation()
-                self.showError(message: "Oh no! Log in failed: \(error!.localizedDescription)")
+                self.showError(message: "Log in failed: \(error!.localizedDescription). Please, try again!")
             }
             
             let successClosure : CompletionClosure = { result, error in
@@ -83,7 +83,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
                 self.showTabController()
             }
             
-            self.startActivityAnimation(message: "Logging in ")
+            self.startActivityAnimation(message: "Log in ")
             APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text, password: passwordText.text, networkErrorHandler: networkErrorClosure, responseErrorHandler: loginErrorClosure, completionHandler: successClosure)
             
         }
@@ -91,11 +91,11 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
     
     func tryUdacityLoginWithFB(fbToken: String!) {
         hideError()
-        self.startActivityAnimation(message: "Loging in")
+        self.startActivityAnimation(message: "Log in")
         APIClient.sharedInstance.logInToUdacityWithFBToken(fbToken) {result, error in
             self.stopActivityAnimation()
             if let errorMsg = error {
-                self.showWarning(title: "Ups! Logging in didn't work! 😕",
+                self.showWarning(title: "Ups! Login didn't work! 😕",
                     message: errorMsg.localizedDescription)
             } else {
                 self.showTabController()
@@ -143,7 +143,6 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
         logoContainer.backgroundColor = UIColor.clearColor()
         udacityLoginContainer.backgroundColor = UIColor.clearColor()
         facebookLoginContainer.backgroundColor = UIColor.clearColor()
-        errorContainer.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
 
         // Nice gradient effect for background
@@ -155,6 +154,12 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
         backgroundGradient.frame = view.frame
         self.view.layer.insertSublayer(backgroundGradient, atIndex: 0)
 
+        // Configuring error box: 
+        errorContainer.backgroundColor = UIColor.clearColor()
+        errorContainer.layer.cornerRadius = 15.0
+        errorContainer.layer.borderColor = UIColor.whiteColor().CGColor
+        errorContainer.layer.borderWidth = 2.0
+        errorContainer.clipsToBounds = true
         
         // All labels
         loginUdacityLabel.font = UIFont(name: "Roboto-Medium", size: 22.0)

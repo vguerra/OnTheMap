@@ -139,10 +139,16 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9ST-2J-qSp" userLabel="Error Container">
-                                        <rect key="frame" x="0.0" y="53" width="600" height="77"/>
+                                        <rect key="frame" x="20" y="64" width="560" height="62"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Log in Errors" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="7yM-r9-x4b">
-                                                <rect key="frame" x="8" y="28" width="584" height="21"/>
+                                                <rect key="frame" x="8" y="21" width="544" height="21"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="⚠️" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dz8-2L-glu">
+                                                <rect key="frame" x="530" y="8" width="22" height="21"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                 <nil key="highlightedColor"/>
@@ -152,6 +158,8 @@
                                         <constraints>
                                             <constraint firstItem="7yM-r9-x4b" firstAttribute="leading" secondItem="9ST-2J-qSp" secondAttribute="leading" constant="8" id="QtU-4b-QC7"/>
                                             <constraint firstAttribute="centerY" secondItem="7yM-r9-x4b" secondAttribute="centerY" id="emE-eH-Wtc"/>
+                                            <constraint firstAttribute="trailing" secondItem="dz8-2L-glu" secondAttribute="trailing" constant="8" id="hPe-9w-hoC"/>
+                                            <constraint firstItem="dz8-2L-glu" firstAttribute="top" secondItem="9ST-2J-qSp" secondAttribute="top" constant="8" id="lXr-VT-jsE"/>
                                             <constraint firstAttribute="trailing" secondItem="7yM-r9-x4b" secondAttribute="trailing" constant="8" id="rIZ-c4-vAQ"/>
                                             <constraint firstAttribute="centerX" secondItem="7yM-r9-x4b" secondAttribute="centerX" id="vBb-uv-HS9"/>
                                         </constraints>
@@ -159,13 +167,13 @@
                                 </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstItem="9ST-2J-qSp" firstAttribute="leading" secondItem="z45-hR-TsC" secondAttribute="leading" id="2sf-a0-KsZ"/>
-                                    <constraint firstItem="BXb-gf-hZH" firstAttribute="top" secondItem="9ST-2J-qSp" secondAttribute="bottom" constant="8" id="3AU-OH-z5P"/>
+                                    <constraint firstItem="9ST-2J-qSp" firstAttribute="leading" secondItem="z45-hR-TsC" secondAttribute="leading" constant="20" id="2sf-a0-KsZ"/>
+                                    <constraint firstItem="BXb-gf-hZH" firstAttribute="top" secondItem="9ST-2J-qSp" secondAttribute="bottom" constant="12" id="3AU-OH-z5P"/>
                                     <constraint firstItem="QZw-7u-dMg" firstAttribute="top" secondItem="z45-hR-TsC" secondAttribute="top" constant="20" id="Fta-TV-Y6E"/>
-                                    <constraint firstItem="9ST-2J-qSp" firstAttribute="top" secondItem="QZw-7u-dMg" secondAttribute="bottom" constant="-3" id="RhQ-Ci-zfa"/>
+                                    <constraint firstItem="9ST-2J-qSp" firstAttribute="top" secondItem="QZw-7u-dMg" secondAttribute="bottom" constant="8" id="RhQ-Ci-zfa"/>
                                     <constraint firstAttribute="bottom" secondItem="BXb-gf-hZH" secondAttribute="bottom" constant="19" id="b06-Ov-3ln"/>
                                     <constraint firstAttribute="centerX" secondItem="QZw-7u-dMg" secondAttribute="centerX" id="i2g-6j-4ob"/>
-                                    <constraint firstAttribute="trailing" secondItem="9ST-2J-qSp" secondAttribute="trailing" id="qDS-yv-v7k"/>
+                                    <constraint firstAttribute="trailing" secondItem="9ST-2J-qSp" secondAttribute="trailing" constant="20" id="qDS-yv-v7k"/>
                                 </constraints>
                             </view>
                         </subviews>
