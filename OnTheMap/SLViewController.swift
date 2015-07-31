@@ -108,7 +108,7 @@ class SLViewController : UIViewController {
         // check if we want to overwrite.
         let overwriteAlert = UIAlertController(title: "Did you know that ... ", message: "you have already submitted a location?, Would you like to overwrite it?", preferredStyle: UIAlertControllerStyle.Alert)
         let okAction = UIAlertAction(title: "No, I am good! 👌🏻", style: UIAlertActionStyle.Default, handler: nil)
-        let overwriteAction = UIAlertAction(title: "Yes plase! 👍", style: UIAlertActionStyle.Default) { action in
+        let overwriteAction = UIAlertAction(title: "Yes please! 👍", style: UIAlertActionStyle.Default) { action in
             let controller = self.storyboard!.instantiateViewControllerWithIdentifier("InfoPostingViewController") as! InfoPostingViewController
             
             self.presentViewController(controller, animated: true, completion: nil)
