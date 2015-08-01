@@ -93,10 +93,15 @@ class SLViewController : UIViewController {
                 self.stopActivityAnimation()
                 if let errorMsg = error {
                     self.showWarning(title: "Upss! 😁", message: errorMsg.localizedDescription)
-                } else {
+                } else if locations!.count > 0 {
                     let location = locations![0]
                     APIClient.sharedInstance.objectID = location.objectId
                     self.showOverwriteAlert()
+                } else {
+                    let controller = self.storyboard!.instantiateViewControllerWithIdentifier("InfoPostingViewController") as! InfoPostingViewController
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.presentViewController(controller, animated: true, completion: nil)
+                    }
                 }
             }
         } else {
