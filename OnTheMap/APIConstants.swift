@@ -45,6 +45,7 @@ extension APIClient {
     struct ParameterKeys {
         static let limitKey = "limit"
         static let orderKey = "order"
+        static let skipKey = "skip"
     }
     
     struct HeaderKeys {

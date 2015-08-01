@@ -36,21 +36,24 @@ extension APIClient {
         }
     }
     
-    func queryStudentLocation(whereDict : [String : AnyObject],
+    func queryStudentLocation(whereDict : [String : AnyObject], page : Int = 0,
         completionHandler : (locations : [StudentLocation]?, error : NSError?) -> Void) -> Void {
             
             let headers : HeadersDict = HeaderKeys.BaseHeaders
             
+            var parameters : URLParametersDict = [
+                ParameterKeys.limitKey : Constants.defaultLocationsCount,
+                ParameterKeys.orderKey : Constants.OrderByField
+//                ,
+//                ParameterKeys.skipKey : page * Constants.defaultLocationsCount
+            ]
+
             // composing where url parameter value.
             var values = [String]()
             for (key, value) in whereDict {
                 values.append("\"\(key)\":\"\(value)\"")
             }
             
-            var parameters : URLParametersDict = [
-                ParameterKeys.limitKey : Constants.defaultLocationsCount,
-                ParameterKeys.orderKey : Constants.OrderByField
-            ]
 
             if !values.isEmpty {
                 let whereValues = ",".join(values)
