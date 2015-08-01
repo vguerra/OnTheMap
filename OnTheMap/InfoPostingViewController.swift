@@ -22,6 +22,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
     @IBOutlet weak var findMapButton: BorderedButton!
     @IBOutlet weak var submitButton: BorderedButton!
     @IBOutlet weak var cancelButton: BorderedButton!
+    @IBOutlet weak var browseButton: BorderedButton!
     
     @IBOutlet weak var upperContainer: UIView!
     @IBOutlet weak var lowerContainer: UIView!
@@ -53,6 +54,16 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
     // MARK: IBActions
     @IBAction func cancelButtonTouchUp(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    @IBAction func browseButtonTouchUp(sender: AnyObject) {
+        if personalLinkTextField.text.isEmpty {
+            self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Enter a personal link please! ☺️")
+        } else if !verifyUrl(personalLinkTextField.text) {
+            self.showWarning(title: "That link seems wrong 😕", message: "Please enter a valid one ☺️")
+        } else {
+            self.openMediaURL(personalLinkTextField.text)
+        }
     }
     
     @IBAction func findMapButtonTouchUp() {
@@ -169,6 +180,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
         self.personalLinkTextField.hidden = true
         self.map.hidden = true
         self.submitButton.hidden = true
+        self.browseButton.hidden = true
         
         upperContainer.backgroundColor = UIColor(red: 0.850, green: 0.850, blue: 0.850, alpha: 1.0)
     }
@@ -188,6 +200,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
         self.personalLinkTextField.hidden = false
         self.map.hidden = false
         self.submitButton.hidden = false
+        self.browseButton.hidden = false
         
         upperContainer.backgroundColor = UIColor(red: 0.250, green: 0.450, blue: 0.660, alpha: 1.0)
     }
@@ -214,6 +227,12 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
         submitButton.backgroundColor = whiteColor
         submitButton.backingColor = whiteColor
         submitButton.highlightedBackingColor = whiteColor
+
+        browseButton.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 16.0)
+        browseButton.setTitleColor(blueColor, forState: UIControlState.Normal)
+        browseButton.backgroundColor = whiteColor
+        browseButton.backingColor = whiteColor
+        browseButton.highlightedBackingColor = whiteColor
 
         cancelButton.titleLabel?.font = UIFont(name: "Roboto-Medium", size: 16.0)
         cancelButton.setTitleColor(blueColor, forState: UIControlState.Normal)
