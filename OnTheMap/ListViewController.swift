@@ -38,7 +38,7 @@ class ListViewController : SLViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let studentCell = tableView.dequeueReusableCellWithIdentifier("StudentLocationCell", forIndexPath: indexPath) as! UITableViewCell
+        let studentCell = tableView.dequeueReusableCellWithIdentifier("StudentLocationCell", forIndexPath: indexPath) 
         
         let location = APIClient.sharedInstance.studentLocations![indexPath.row]
         studentCell.imageView!.image = UIImage(named: "PinIcon")

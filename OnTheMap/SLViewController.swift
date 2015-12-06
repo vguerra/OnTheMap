@@ -49,7 +49,7 @@ class SLViewController : UIViewController {
         self.view.addSubview(activityView)
     }
     
-    func startActivityAnimation(#message: String) {
+    func startActivityAnimation(message message: String) {
         dispatch_async(dispatch_get_main_queue()) {
             self.activityLabel.text = message
             self.activityView.hidden = false

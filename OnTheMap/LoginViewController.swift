@@ -60,11 +60,11 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
     
     @IBAction func tryUdacityLogin(sender: AnyObject) {
         hideError()
-        if !emailText.text.isEmail() {
+        if !emailText.text!.isEmail() {
             self.showWarning(title: "Invalid Email 😁",
                 message: "Please verify the email address, it should be a valid one 😉!")
         }
-        else if passwordText.text.isEmpty {
+        else if passwordText.text!.isEmpty {
             self.showWarning(title: "No password 😔",
                 message: "A password is needed for the log in 😏, please provide one")
         } else {
@@ -84,7 +84,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
             }
             
             self.startActivityAnimation(message: "Log in ")
-            APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text, password: passwordText.text, networkErrorHandler: networkErrorClosure, responseErrorHandler: loginErrorClosure, completionHandler: successClosure)
+            APIClient.sharedInstance.logInToUdacityWithEmail(emailText.text!, password: passwordText.text!, networkErrorHandler: networkErrorClosure, responseErrorHandler: loginErrorClosure, completionHandler: successClosure)
             
         }
     }
@@ -130,7 +130,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
     func hideError() {
         self.errorContainer.hidden = true
     }
-    func showError(#message: String) {
+    func showError(message message: String) {
         dispatch_async(dispatch_get_main_queue()) {
             self.errorContainer.hidden = false
             self.loginErrorLabel.text = message
@@ -148,7 +148,7 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
         // Nice gradient effect for background
         let colorTop = UIColor(red: 0.980, green: 0.580, blue: 0.040, alpha: 1.0).CGColor
         let colorBottom = UIColor(red: 0.980, green: 0.440, blue: 0.000, alpha: 1.0).CGColor
-        var backgroundGradient = CAGradientLayer()
+        let backgroundGradient = CAGradientLayer()
         backgroundGradient.colors = [colorTop, colorBottom]
         backgroundGradient.locations = [0.0, 1.0]
         backgroundGradient.frame = view.frame
@@ -219,7 +219,9 @@ class LoginViewController : SLViewController, FBSDKLoginButtonDelegate, UITextFi
 
 extension String {
     func isEmail() -> Bool {
-        let regex = NSRegularExpression(pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", options: .CaseInsensitive, error: nil)
-        return regex?.firstMatchInString(self, options: nil, range: NSMakeRange(0, count(self))) != nil
+        if let regex = try? NSRegularExpression(pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", options: .CaseInsensitive) {
+            return regex.firstMatchInString(self, options: .Anchored, range: NSMakeRange(0, self.characters.count)) != nil
+        }
+        return false
     }
 }

@@ -56,7 +56,7 @@ extension APIClient {
             
 
             if !values.isEmpty {
-                let whereValues = ",".join(values)
+                let whereValues = values.joinWithSeparator(",")
                 parameters["where"] = "{\(whereValues)}"
             }
             
@@ -144,13 +144,13 @@ extension APIClient {
                 
                 switch (JSONBody, error) {
 
-                case let (.None, .None):
+                case (.None, .None):
                     break
                     
                 case let (.None, .Some(errorMsg)):
                     networkErrorHandler(error: errorMsg)
                 
-                case let (.Some(JSONBody), .Some(errorMsg)):
+                case let (.Some(_), .Some(errorMsg)):
                     responseErrorHandler(error: errorMsg)
                 
                 case let (.Some(JSONBody), .None):
@@ -167,13 +167,13 @@ extension APIClient {
                             
                             switch(JSONBody, error) {
 
-                            case let (.None, .None):
+                            case (.None, .None):
                                 break
 
                             case let (.None, .Some(errorMsg)):
                                 networkErrorHandler(error: errorMsg)
 
-                            case let (.Some(JSONBody), .Some(errorMsg)):
+                            case let (.Some(_), .Some(errorMsg)):
                                 responseErrorHandler(error: errorMsg)
 
                             case let (.Some(JSONBody), .None):
@@ -231,11 +231,10 @@ extension APIClient {
         
         var headers = HeadersDict()
         
-        var xsrfCookie : NSHTTPCookie? = nil
         let sharedCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
-        for cookie in sharedCookieStorage.cookies as! [NSHTTPCookie] {
+        for cookie in sharedCookieStorage.cookies! {
             if cookie.name == Cookies.CookieTokenName {
-                headers[HeaderKeys.CookieTokenKey] = cookie.value!
+                headers[HeaderKeys.CookieTokenKey] = cookie.value
             }
         }
         

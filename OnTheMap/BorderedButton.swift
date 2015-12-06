@@ -32,7 +32,7 @@ class BorderedButton: UIButton {
     // MARK: - Initialization
     
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
         self.themeBorderedButton()
     }
     
@@ -42,7 +42,7 @@ class BorderedButton: UIButton {
     }
     
     func themeBorderedButton() -> Void {
-        let userInterfaceIdiom = UIDevice.currentDevice().userInterfaceIdiom
+        _ = UIDevice.currentDevice().userInterfaceIdiom
         self.layer.masksToBounds = true
         self.layer.cornerRadius = borderedButtonCornerRadius
         self.highlightedBackingColor = darkerBlue
@@ -68,12 +68,12 @@ class BorderedButton: UIButton {
     
     // MARK: - Tracking
     
-    override func beginTrackingWithTouch(touch: UITouch, withEvent: UIEvent) -> Bool {
+    override func beginTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
         self.backgroundColor = self.highlightedBackingColor
         return true
     }
     
-    override func endTrackingWithTouch(touch: UITouch, withEvent: UIEvent) {
+    override func endTrackingWithTouch(touch: UITouch?, withEvent event: UIEvent?) {
         self.backgroundColor = self.backingColor
     }
     
@@ -84,7 +84,7 @@ class BorderedButton: UIButton {
     // MARK: - Layout
     
     override func sizeThatFits(size: CGSize) -> CGSize {
-        let userInterfaceIdiom = UIDevice.currentDevice().userInterfaceIdiom
+        _ = UIDevice.currentDevice().userInterfaceIdiom
         let extraButtonPadding : CGFloat = phoneBorderedButtonExtraPadding
         var sizeThatFits = CGSizeZero
         sizeThatFits.width = super.sizeThatFits(size).width + extraButtonPadding

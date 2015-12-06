@@ -57,17 +57,17 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
     }
     
     @IBAction func browseButtonTouchUp(sender: AnyObject) {
-        if personalLinkTextField.text.isEmpty {
+        if personalLinkTextField.text!.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Enter a personal link please! ☺️")
         } else if !verifyUrl(personalLinkTextField.text) {
             self.showWarning(title: "That link seems wrong 😕", message: "Please enter a valid one ☺️")
         } else {
-            self.openMediaURL(personalLinkTextField.text)
+            self.openMediaURL(personalLinkTextField.text!)
         }
     }
     
     @IBAction func findMapButtonTouchUp() {
-        if locationStringTextField.text.isEmpty {
+        if locationStringTextField.text!.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Your location is need, please enter it 😉")
         } else {
             self.startActivityAnimation(message: "Geocoding location")
@@ -75,15 +75,15 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
             
             let geoCoder = CLGeocoder()
             
-            geoCoder.geocodeAddressString(locationString) {
+            geoCoder.geocodeAddressString(locationString!) {
                 placeMarks, error in
                 self.stopActivityAnimation()
-                if let errorMsg = error {
+                if let _ = error {
                     self.showWarning(title: "Sorry! geocoding did not work. 😕",
                         message: "Probably the location you entered is invalid, Try again please! 😉")
-                } else if let placemark = placeMarks[0] as? CLPlacemark {
+                } else if let placemark = placeMarks?[0] {
                     let pointAnnotation = MKPointAnnotation()
-                    self.studentCoordinates = placemark.location.coordinate
+                    self.studentCoordinates = placemark.location!.coordinate
                     pointAnnotation.coordinate = self.studentCoordinates!
                     pointAnnotation.title = locationString
                     
@@ -98,7 +98,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
     }
     
     @IBAction func submitButtonTouchUp() {
-        if personalLinkTextField.text.isEmpty {
+        if personalLinkTextField.text!.isEmpty {
             self.showWarning(title: "Hey, \(APIClient.sharedInstance.firstName)", message: "Your fellow students would like to know about you, enter a personal link please! ☺️")
         } else if !verifyUrl(personalLinkTextField.text) {
             self.showWarning(title: "That link seems wrong 😕", message: "Please enter a valid one ☺️")
@@ -119,7 +119,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
                 let studentLocation = StudentLocation(dict: studentDict)
                 
                 var sendinLocationError = false
-                if let objectId = APIClient.sharedInstance.objectID {
+                if let _ = APIClient.sharedInstance.objectID {
                     APIClient.sharedInstance.putStudentLocation(studentLocation) {
                         error in
                         self.stopActivityAnimation()
@@ -155,7 +155,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
     }
     
     // Keeping the text within the textViews centered horizontally and vertically
-    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if let textView = object as? UITextView {
             var y: CGFloat = (textView.bounds.size.height - textView.contentSize.height * textView.zoomScale)/2.0;
             if y < 0 {
@@ -163,6 +163,7 @@ class InfoPostingViewController : SLViewController, UITextFieldDelegate {
             }
             textView.contentOffset = CGPoint(x: 0, y: -y)
         }
+        
     }
 
     // MARK : UI Elements manipulation/configuration

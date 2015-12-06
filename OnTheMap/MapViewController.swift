@@ -40,7 +40,7 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
     // Placing all pins on the map
     func populateMap() {
         if let studenLocations = APIClient.sharedInstance.studentLocations {
-            var annotations : [MKAnnotation] = studenLocations.map() {
+            let annotations : [MKAnnotation] = studenLocations.map() {
                 let pAnnotation = MKPointAnnotation()
                 pAnnotation.title = $0.title
                 pAnnotation.subtitle = $0.mediaURL
@@ -63,13 +63,13 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
     }
     
     // MARK: Conforming to MKMapViewDelegate
-    func mapView(mapView: MKMapView!, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+    func mapView(mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == annotationView.rightCalloutAccessoryView {
-            openMediaURL(annotationView.annotation.subtitle!)
+            openMediaURL(annotationView.annotation!.subtitle!!)
         }
     }
 
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
         if pinView == nil {
@@ -77,7 +77,7 @@ class MapViewController : SLViewController, MKMapViewDelegate, CommonNavigationB
             pinView!.canShowCallout = true
             pinView!.animatesDrop = false
             pinView!.pinColor = .Red
-            pinView!.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+            pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
         }
         else {
             pinView!.annotation = annotation

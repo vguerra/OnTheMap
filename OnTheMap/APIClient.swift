@@ -56,9 +56,8 @@ class APIClient : NSObject {
             if !jsonBody.isEmpty && httpMethod != .GET {
                 request.addValue("application/json", forHTTPHeaderField: "Accept")
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                var jsonifyError: NSError? = nil
-                request.HTTPBody = NSJSONSerialization.dataWithJSONObject(jsonBody,
-                    options: nil, error: &jsonifyError)
+
+                request.HTTPBody = try? NSJSONSerialization.dataWithJSONObject(jsonBody, options: NSJSONWritingOptions(rawValue: 0))
             }
             
             let task = session.dataTaskWithRequest(request) { data, response, downloadError in
@@ -66,7 +65,7 @@ class APIClient : NSObject {
                     completionHandler(result: nil, error: error)
                 } else {
                     APIClient.parseJSONWithCompletionHandler(APIClient.Constants.skipConfig[baseURL]!,
-                        data: data, completionHandler: completionHandler)
+                        data: data!, completionHandler: completionHandler)
                 }
             }
             
@@ -109,23 +108,25 @@ class APIClient : NSObject {
     }
 
     
-    // Helper: Given raw JSON, return a usable Foundation object
+    // Helper: Given raw JSON, return an usable Foundation object
     class func parseJSONWithCompletionHandler(skipChars: Int, data: NSData, completionHandler: CompletionClosure) {
-        var parsingError: NSError? = nil
-        let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(
+        do {
+            let parsedResult: AnyObject = try NSJSONSerialization.JSONObjectWithData(
             APIClient.skipFirstCharsOf(data, skipChars: skipChars),
-            options: NSJSONReadingOptions.AllowFragments,
-            error: &parsingError)
-        if let error = parsingError {
+            options: NSJSONReadingOptions.AllowFragments)
+            
+            if let errorMessage = parsedResult.valueForKey(APIClient.JSONResponseKeys.Error) as? String {
+                let userInfo = [NSLocalizedDescriptionKey : errorMessage]
+                let code = parsedResult.valueForKey(APIClient.JSONResponseKeys.Code) as? Int
+                let status = parsedResult.valueForKey(APIClient.JSONResponseKeys.Status) as? Int
+                let responseError = NSError(domain: APIClient.Constants.ErrorDomain, code: status ?? code!, userInfo: userInfo)
+                completionHandler(result: parsedResult, error: responseError)
+            } else {
+                completionHandler(result: parsedResult, error: nil)
+            }
+            
+        } catch let error as NSError {
             completionHandler(result: nil, error: error)
-        } else if let errorMessage = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Error) as? String {
-            let userInfo = [NSLocalizedDescriptionKey : errorMessage]
-            let code = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Code) as? Int
-            let status = parsedResult?.valueForKey(APIClient.JSONResponseKeys.Status) as? Int
-            let responseError = NSError(domain: APIClient.Constants.ErrorDomain, code: status ?? code!, userInfo: userInfo)
-            completionHandler(result: parsedResult, error: responseError)
-        } else {
-            completionHandler(result: parsedResult, error: nil)
         }
     }
 
@@ -145,7 +146,7 @@ class APIClient : NSObject {
             let escapedValue = stringValue.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
             urlVars += [key + "=" + "\(escapedValue!)"]
         }
-        return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
+        return (!urlVars.isEmpty ? "?" : "") + urlVars.joinWithSeparator("&")
     }
 
     // Helper function: Trimming some leading chars depending on the server we communicate with
